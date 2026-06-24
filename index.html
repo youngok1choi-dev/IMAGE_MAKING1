@@ -1840,6 +1840,8 @@ function _buildMsgs(){
     if(out.length&&out[out.length-1].role===m.role) return;
     out.push({role:m.role, content:m.content.trim()});
   });
+  /* API 규격: messages는 반드시 user 역할로 시작해야 함 */
+  while(out.length&&out[0].role!=='user') out.shift();
   return out;
 }
 
@@ -1849,16 +1851,11 @@ async function callClaude(){
 
   var res;
   try{
-    res=await fetch('https://api.anthropic.com/v1/messages',{
+    res=await fetch('/api/chat',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':CLAUDE_API_KEY,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',
+        model:'claude-3-5-sonnet-20241022',
         max_tokens:1000,
         system:_buildSys(),
         messages:msgs
@@ -1875,7 +1872,10 @@ async function callClaude(){
     var code=res.status;
     if(code===429) throw new Error('요청이 너무 많아요. 잠시 후 다시 시도해 주세요.');
     if(code>=500) throw new Error('서버 오류. 잠시 후 다시 시도해 주세요.');
-    throw new Error('HTTP '+code);
+    var errMsg='HTTP '+code;
+    try{var errJson=JSON.parse(text); if(errJson.error&&errJson.error.message) errMsg=errJson.error.message;}catch(e){}
+    console.error('[GraceAI] API error',code,text);
+    throw new Error(errMsg);
   }
 
   var data;

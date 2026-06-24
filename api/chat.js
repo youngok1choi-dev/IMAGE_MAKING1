@@ -40,6 +40,8 @@ export default async function handler(req) {
       });
     }
 
+    const requestModel = body.model || 'claude-3-5-sonnet-20241022';
+
     // Claude API 호출
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -49,20 +51,20 @@ export default async function handler(req) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022', // 최신 Sonnet 모델 (혹은 claude-3-sonnet-20240229)
-        max_tokens: 1000,
-        temperature: 0.7,
+        model: requestModel,
+        max_tokens: body.max_tokens || 1000,
         system: system,
         messages: messages
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Claude API Error:', response.status, errorData);
-      return new Response(JSON.stringify({ error: `Claude API Error: ${response.status}`, details: errorData }), {
+      const errorText = await response.text();
+      console.error('Claude API Error:', response.status, errorText);
+      // Anthropic 에러 응답을 그대로 전달
+      return new Response(errorText, {
         status: response.status,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
