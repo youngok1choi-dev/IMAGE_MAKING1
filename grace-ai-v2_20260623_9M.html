@@ -1805,10 +1805,8 @@ function showToast(msg){
 
 
 
-/* ═══════════════════ GEMINI API ═══════════════════ */
-// GitHub 시크릿 스캔 우회를 위해 base64 인코딩 사용
-var GEMINI_API_KEY=atob('QVEuQWI4Uk42SWhrWTRRY2QwY3J4RldVaG5Jc3h5U3RLUjdkNm4tLWlSYk8xdjRuc2Q4R2c=');
-var GEMINI_ENDPOINT='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=';
+/* ═══════════════════ CLAUDE API (Vercel Proxy) ═══════════════════ */
+// API 키는 Vercel 환경 변수(ANTHROPIC_API_KEY)에 안전하게 저장됩니다.
 
 function buildSystemPrompt(){
   var bd=bodyData(); var s=seasonData();
@@ -1826,7 +1824,8 @@ function _buildSys(){
   }
 }
 
-function _buildGeminiContents(){
+/* ═══ Claude API (Vercel Proxy 호출) ══════ */
+function _buildMsgs(){
   var BAD=['연결이 원활','응답을 받지','인터넷 연결','응답이 너무','HTTP ','empty','오류'];
   var out=[];
   state.chatHistory.forEach(function(m){
@@ -1834,27 +1833,26 @@ function _buildGeminiContents(){
     if(!m.content||!m.content.trim()) return;
     var bad=false; BAD.forEach(function(b){ if(m.content.indexOf(b)>=0) bad=true; });
     if(bad) return;
-    var role=m.role==='assistant'?'model':'user';
-    if(out.length&&out[out.length-1].role===role) return;
-    out.push({role:role, parts:[{text:m.content.trim()}]});
+    if(out.length&&out[out.length-1].role===m.role) return;
+    out.push({role:m.role, content:m.content.trim()});
   });
   return out;
 }
 
-async function callGemini(){
-  var contents=_buildGeminiContents();
-  if(!contents.length||contents[contents.length-1].role!=='user') return null;
+async function callClaude(){
+  var msgs=_buildMsgs();
+  if(!msgs.length||msgs[msgs.length-1].role!=='user') return null;
 
   var sys=_buildSys();
   var body={
-    systemInstruction:{parts:[{text:sys}]},
-    contents:contents,
-    generationConfig:{maxOutputTokens:1000,temperature:0.8}
+    system: sys,
+    messages: msgs
   };
 
   var res;
   try{
-    res=await fetch(GEMINI_ENDPOINT+GEMINI_API_KEY,{
+    // 자체 구축한 Vercel 서버리스 함수 호출
+    res=await fetch('/api/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(body)
@@ -1875,10 +1873,11 @@ async function callGemini(){
 
   var data;
   try{ data=JSON.parse(text); }catch(e){ throw new Error('응답 형식 오류'); }
-  if(data.candidates&&data.candidates[0]&&data.candidates[0].content&&
-     data.candidates[0].content.parts&&data.candidates[0].content.parts[0]){
-    return data.candidates[0].content.parts[0].text;
+  
+  if(data.content&&data.content[0]&&data.content[0].text) {
+    return data.content[0].text;
   }
+  
   if(data.error) throw new Error(data.error.message||'API 오류');
   throw new Error('빈 응답');
 }
@@ -1903,7 +1902,7 @@ async function sendMessage(text){
   renderMain(); scrollChat();
 
   var reply=null, errMsg=null;
-  try{ reply=await callGemini(); }
+  try{ reply=await callClaude(); }
   catch(e){ console.error('[GraceAI]',e.message); errMsg=e.message; }
 
   if(reply){
