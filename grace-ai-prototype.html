@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>GRACE AI — 어른의 품격</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B2A33;
+    --ink-soft:#736C72;
+    --paper:#FBF7F1;
+    --backdrop:#E9E2D6;
+    --line:#E1D6C6;
+    --gold:#B6925B;
+    --gold-deep:#8E7240;
+    --navy:#22395C;
+    --navy-soft:#E3E8EF;
+    --rose:#9C5E78;
+    --rose-soft:#F1E1E8;
+    --good:#4C7A5E;
+    --shadow: 0 18px 40px -16px rgba(43,42,51,0.28);
+  }
+  *{box-sizing:border-box;}
+  html{font-size:17px;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--backdrop);
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(182,146,91,0.10), transparent 45%),
+      radial-gradient(circle at 84% 86%, rgba(34,57,92,0.08), transparent 45%);
+    font-family:'Noto Sans KR', sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 12px;
+  }
+  .serif{font-family:'Noto Serif KR', serif;}
+
+  .device{
+    width:100%;
+    max-width:402px;
+    height:min(844px, 94vh);
+    background:var(--paper);
+    border-radius:34px;
+    box-shadow:var(--shadow);
+    border:1px solid rgba(43,42,51,0.06);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    position:relative;
+  }
+  @media (max-width:440px){
+    body{padding:0;}
+    .device{height:100vh; max-width:100%; border-radius:0; box-shadow:none; border:none;}
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 18px 8px;
+    min-height:34px;
+  }
+  .backbtn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid var(--line);
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--ink);
+    visibility:hidden;
+  }
+  .backbtn.show{visibility:visible;}
+  .backbtn svg{width:18px;height:18px;}
+  .dots{display:flex;gap:7px;align-items:center;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .25s, transform .25s;}
+  .dot.active{background:var(--gold);transform:scale(1.3);}
+  .brandmini{font-size:.78rem;letter-spacing:.14em;font-weight:700;color:var(--gold-deep);visibility:hidden;}
+  .brandmini.show{visibility:visible;}
+
+  /* ---------- Zones ---------- */
+  .visual-zone{
+    flex:0 0 38%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    padding:6px 24px;
+    overflow:hidden;
+  }
+  .content-zone{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding:6px 26px 14px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .action-bar{
+    flex:0 0 auto;
+    padding:14px 22px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    border-top:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(251,247,241,0.4), var(--paper) 35%);
+  }
+
+  /* ---------- Typography ---------- */
+  .eyebrow{
+    font-size:.82rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:2px 0 8px;
+  }
+  h1.title{
+    font-family:'Noto Serif KR',serif;
+    font-size:1.5rem;
+    line-height:1.35;
+    font-weight:700;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  p.desc{
+    font-size:.96rem;
+    line-height:1.6;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius:16px;
+    min-height:58px;
+    padding:0 20px;
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:1.02rem;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    transition:transform .12s, opacity .2s, background .2s;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary.tone-navy{background:var(--navy);}
+  .btn-primary.tone-rose{background:var(--rose);}
+  .btn-primary:disabled{background:#D9D2C4;color:#A39E91;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);font-weight:500;min-height:44px;}
+  .btn-ghost:active{transform:none;}
+
+  /* ---------- Option cards ---------- */
+  .option-stack{display:flex;flex-direction:column;gap:12px;margin-bottom:8px;}
+  .option-card{
+    border:1.5px solid var(--line);
+    background:#fff;
+    border-radius:18px;
+    padding:16px 16px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .option-card:active{transform:scale(0.99);}
+  .option-card .icon{
+    flex:0 0 auto;
+    width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--navy-soft);
+    color:var(--navy);
+  }
+  .option-card.rose .icon{background:var(--rose-soft);color:var(--rose);}
+  .option-card .icon svg{width:22px;height:22px;}
+  .option-card .label{font-size:1rem;font-weight:700;color:var(--ink);margin:0 0 2px;}
+  .option-card .sub{font-size:.84rem;color:var(--ink-soft);margin:0;line-height:1.45;}
+  .option-card.selected{border-color:var(--gold); background:#FFFBF3;}
+  .option-card.selected.tone-navy{border-color:var(--navy);}
+  .option-card.selected.tone-rose{border-color:var(--rose);}
+  .check-mark{
+    flex:0 0 auto;width:24px;height:24px;border-radius:50%;
+    border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .option-card.selected .check-mark{background:var(--gold);border-color:var(--gold);}
+  .option-card.selected.tone-navy .check-mark{background:var(--navy);border-color:var(--navy);}
+  .option-card.selected.tone-rose .check-mark{background:var(--rose);border-color:var(--rose);}
+  .check-mark svg{width:14px;height:14px;color:#fff;visibility:hidden;}
+  .option-card.selected .check-mark svg{visibility:visible;}
+
+  /* ---------- Splash ---------- */
+  .splash-wrap{
+    height:100%;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    padding:0 30px;
+  }
+  .splash-mark{
+    font-family:'Noto Serif KR',serif;
+    font-size:2.1rem;font-weight:700;letter-spacing:.04em;
+    color:var(--ink);
+  }
+  .splash-mark span{color:var(--gold);}
+  .splash-sub{font-size:1.04rem; color:var(--ink-soft); margin:10px 0 0; line-height:1.6;}
+  .splash-tagline{
+    margin-top:30px;font-size:.86rem;letter-spacing:.05em;color:var(--gold-deep);font-weight:700;
+  }
+  .splash-cta-wrap{padding:0 26px 30px;}
+
+  /* ---------- Dial ---------- */
+  .dial-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .dial-caption{font-size:.84rem;color:var(--ink-soft);font-weight:700;min-height:18px;text-align:center;}
+
+  /* ---------- Silhouette / scan ---------- */
+  .scan-stage{position:relative;width:120px;height:150px;}
+  .scan-box{
+    position:absolute;border:2px solid var(--gold);border-radius:6px;opacity:0;
+    animation:scanblink 2.4s ease-in-out infinite;
+  }
+  @keyframes scanblink{
+    0%,100%{opacity:0;} 18%{opacity:1;} 38%{opacity:0;}
+  }
+  .ring-wrap{position:relative;width:128px;height:128px;display:flex;align-items:center;justify-content:center;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-pct{position:absolute;font-weight:900;font-size:1.3rem;color:var(--ink);}
+
+  /* ---------- Badges / chips ---------- */
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .chip{
+    border-radius:999px;padding:7px 13px;font-size:.8rem;font-weight:700;
+    background:var(--navy-soft);color:var(--navy);
+  }
+  .chip.rose{background:var(--rose-soft);color:var(--rose);}
+  .chip.gold{background:#F4E9D6;color:var(--gold-deep);}
+
+  /* ---------- Result / outfit cards ---------- */
+  .result-card{
+    background:#fff;border:1px solid var(--line);border-radius:18px;
+    padding:16px;margin-bottom:14px;
+  }
+  .result-card h3{margin:0 0 6px;font-size:1rem;font-family:'Noto Serif KR',serif;}
+  .result-card p{margin:0;font-size:.9rem;line-height:1.55;color:var(--ink-soft);}
+  .swatch-row{display:flex;gap:8px;margin-top:12px;}
+  .swatch{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,0.08);}
+
+  /* ---------- Coaching ---------- */
+  .coach-card{
+    display:flex;align-items:flex-start;gap:12px;
+    background:#fff;border:1.5px solid var(--line);border-radius:18px;
+    padding:15px;margin-bottom:12px;cursor:pointer;transition:border-color .15s, background .15s;
+  }
+  .coach-card.done{border-color:var(--good); background:#F2F8F4;}
+  .coach-box{
+    flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;margin-top:2px;
+  }
+  .coach-card.done .coach-box{background:var(--good);border-color:var(--good);}
+  .coach-box svg{width:15px;height:15px;color:#fff;visibility:hidden;}
+  .coach-card.done .coach-box svg{visibility:visible;}
+  .coach-title{font-weight:700;font-size:.96rem;margin:0 0 3px;}
+  .coach-desc{font-size:.84rem;color:var(--ink-soft);line-height:1.5;margin:0;}
+  .coach-tag{display:inline-block;margin-top:6px;font-size:.74rem;font-weight:700;color:var(--gold-deep);background:#F4E9D6;border-radius:8px;padding:2px 8px;}
+
+  /* ---------- Report ---------- */
+  .report-card{
+    background:linear-gradient(160deg,#fff, #FBF4E8);
+    border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;
+  }
+  .report-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:.9rem;}
+  .report-row:last-child{border-bottom:none;}
+  .report-row span:first-child{color:var(--ink-soft);}
+  .report-row span:last-child{font-weight:700;}
+  .report-msg{
+    font-family:'Noto Serif KR',serif;font-size:1.06rem;line-height:1.6;
+    text-align:center;margin:6px 0 18px;color:var(--ink);
+  }
+  .note-card{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+    font-size:.84rem;color:var(--ink-soft);line-height:1.55;display:flex;gap:10px;align-items:flex-start;
+  }
+  .note-card svg{flex:0 0 auto;width:18px;height:18px;color:var(--gold-deep);margin-top:1px;}
+
+  .skip-link{text-align:center;font-size:.84rem;color:var(--ink-soft);text-decoration:underline;cursor:pointer;margin-top:14px;background:none;border:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .fade-in{animation:fadein .32s ease both;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div class="device" id="device">
+  <div class="topbar">
+    <button class="backbtn" id="backBtn" aria-label="뒤로 가기">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dots" id="dots"></div>
+    <div class="brandmini" id="brandMini">GRACE AI</div>
+  </div>
+
+  <div class="visual-zone" id="visualZone"></div>
+  <div class="content-zone" id="contentZone"></div>
+  <div class="action-bar" id="actionBar"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------------- Data ----------------
+  var BODY_MALE = {
+    straight:{label:'직선형 골격', desc:'근육과 뼈의 윤곽이 또렷하고 절제된 라인을 가진 골격이에요.', outfit:'어깨선이 살아있는 슬림핏 재킷과 깔끔한 셔츠로 절제된 신뢰감을 더해보세요.'},
+    curve:{label:'곡선형 골격', desc:'부드럽고 유연한 인상을 주는 골격이에요.', outfit:'부드러운 소재의 셋업과 라운드 칼라 셔츠로 편안하면서 단정한 인상을 만들어보세요.'},
+    volume:{label:'볼륨형 골격', desc:'단단하고 볼륨감 있는 인상을 주는 골격이에요.', outfit:'여유 있는 핏의 재킷과 세로 패턴 셔츠로 안정감 있는 무게감을 표현해보세요.'}
+  };
+  var BODY_FEMALE = {
+    S:{label:'스트레이트(S)', desc:'상체와 하체의 균형이 또렷한 직선적인 체형이에요.', outfit:'허리 절개선이 있는 슬림한 원피스로 균형 잡힌 라인을 살려보세요.'},
+    W:{label:'웨이브(W)', desc:'부드러운 곡선과 볼륨이 조화를 이루는 체형이에요.', outfit:'잘록한 허리를 강조하는 랩 원피스나 벨트 디테일로 우아한 곡선을 만들어보세요.'},
+    N:{label:'내추럴(N)', desc:'골격이 또렷하게 느껴지는 자연스러운 체형이에요.', outfit:'편안한 실루엣의 셔츠 원피스나 와이드 팬츠로 자연스러운 멋을 더해보세요.'},
+    B:{label:'볼륨(B)', desc:'전체적으로 풍성한 볼륨감을 가진 체형이에요.', outfit:'A라인 원피스나 부드럽게 떨어지는 소재로 우아하게 볼륨을 정리해보세요.'}
+  };
+  var SEASON = {
+    spring:{label:'봄 (Spring)', tone:'웜톤 · 화사함', colors:['#F3B79A','#FFD9A6','#FBEFD9'], note:'화사하고 생기 있는 컬러가 잘 어울려요.'},
+    summer:{label:'여름 (Summer)', tone:'쿨톤 · 부드러움', colors:['#B7CBE0','#C9B8D6','#E7E4E0'], note:'은은하고 부드러운 컬러가 차분한 분위기를 더해줘요.'},
+    autumn:{label:'가을 (Autumn)', tone:'웜톤 · 차분함', colors:['#B97A4A','#8C6239','#D8B98C'], note:'깊고 따뜻한 컬러가 안정감을 더해줘요.'},
+    winter:{label:'겨울 (Winter)', tone:'쿨톤 · 선명함', colors:['#2F4566','#7A1F33','#E7E7E7'], note:'선명하고 또렷한 컬러가 강한 인상을 만들어줘요.'}
+  };
+  var COACH = [
+    {id:'smile', title:'미소 훈련', desc:'아·에·이·오·우를 천천히 발음하며 입꼬리를 살짝 올려보세요.', tag:'1분'},
+    {id:'voice', title:'발성 훈련', desc:'문장에서 가장 중요한 단어에 살짝 힘을 주어 말해보세요.', tag:'2음절 강조'},
+    {id:'posture', title:'단단한 자세', desc:'어깨를 펴고 정수리를 살짝 들어 올려 걸어보세요.', tag:'걷기 훈련'},
+    {id:'mind', title:'마음가짐', desc:'오늘 만난 사람의 입장에서 한 번 더 생각해보세요.', tag:'역지사지'}
+  ];
+
+  // ---------------- State ----------------
+  var STEPS = ['splash','gender','body','color','analyzing','result','coaching','report'];
+  var state = {
+    stepIndex:0,
+    gender:null,
+    bodyKey:null,
+    colorStep:0,      // 0: warm/cool, 1: bright/soft, 2: done
+    warmCool:null,
+    brightSoft:null,
+    season:null,
+    coachDone:{}
+  };
+  var timers = [];
+  function clearTimers(){ timers.forEach(function(t){clearTimeout(t);clearInterval(t);}); timers=[]; }
+
+  function accentTone(){ return state.gender==='male' ? 'navy' : (state.gender==='female' ? 'rose' : null); }
+
+  function icon(name){
+    var icons = {
+      check:'<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+      shield:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+      leaf:'<path d="M5 19c8 1 13-4 14-14C9 6 5 11 5 19z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+      info:'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 11v5M12 8v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+    };
+    return '<svg viewBox="0 0 24 24" fill="none">'+icons[name]+'</svg>';
+  }
+
+  // ---------------- Dial (signature element) ----------------
+  function dialAngle(){
+    if(state.colorStep===0) return 0;
+    if(state.colorStep===1) return state.warmCool==='warm' ? 90 : 270;
+    var map = {spring:45, autumn:135, summer:225, winter:315};
+    return map[state.season] || 0;
+  }
+  function renderDial(size, angle, dim){
+    size = size || 132;
+    var c = 60;
+    var op = dim ? 0.35 : 1;
+    return ''+
+    '<div class="dial-wrap">'+
+    '<svg width="'+size+'" height="'+size+'" viewBox="0 0 120 120" style="opacity:'+op+'">'+
+      '<path d="M60,60 L60,10 A50,50 0 0,1 110,60 Z" fill="#F3B79A"/>'+
+      '<path d="M60,60 L110,60 A50,50 0 0,1 60,110 Z" fill="#B97A4A"/>'+
+      '<path d="M60,60 L60,110 A50,50 0 0,1 10,60 Z" fill="#AFD3E0"/>'+
+      '<path d="M60,60 L10,60 A50,50 0 0,1 60,10 Z" fill="#2F4566"/>'+
+      '<circle cx="60" cy="60" r="50" fill="none" stroke="#fff" stroke-width="3"/>'+
+      '<g style="transform:rotate('+angle+'deg); transform-origin:60px 60px; transition:transform .6s cubic-bezier(.22,1,.36,1);">'+
+        '<polygon points="60,16 65,60 60,66 55,60" fill="#2B2A33"/>'+
+        '<circle cx="60" cy="60" r="7" fill="#fff" stroke="#2B2A33" stroke-width="2"/>'+
+      '</g>'+
+    '</svg>'+
+    '</div>';
+  }
+
+  // ---------------- Renderers: visual zone ----------------
+  function visualFor(step){
+    if(step==='splash'){
+      return renderDial(150, 30, true);
+    }
+    if(step==='gender'){
+      return '<svg width="118" height="130" viewBox="0 0 118 130" fill="none">'+
+        '<ellipse cx="59" cy="34" rx="22" ry="24" stroke="'+'#B6925B'+'" stroke-width="2"/>'+
+        '<path d="M20 124c2-30 16-46 39-46s37 16 39 46" stroke="#B6925B" stroke-width="2" stroke-linecap="round"/>'+
+        '</svg>';
+    }
+    if(step==='body'){
+      var t = state.gender==='male' ? '#22395C' : '#9C5E78';
+      return '<svg width="100" height="140" viewBox="0 0 100 140" fill="none">'+
+        '<circle cx="50" cy="22" r="16" stroke="'+t+'" stroke-width="2.2"/>'+
+        '<path d="M50 38v46M28 56h44M30 138l14-54M70 138l-14-54" stroke="'+t+'" stroke-width="2.2" stroke-linecap="round"/>'+
+        '</svg>';
+    }
+    if(step==='color'){
+      return renderDial(150, dialAngle(), false) + '<div class="dial-caption">'+ (state.season ? SEASON[state.season].label : (state.colorStep===1 ? (state.warmCool==='warm'?'웜톤 방향으로...':'쿨톤 방향으로...') : '톤을 살펴보고 있어요')) +'</div>';
+    }
+    if(step==='analyzing'){
+      return '<div class="ring-wrap">'+
+        '<svg width="128" height="128"><circle cx="64" cy="64" r="54" stroke="#E1D6C6" stroke-width="8" fill="none"/>'+
+        '<circle id="ringProgress" cx="64" cy="64" r="54" stroke="#B6925B" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="339"/></svg>'+
+        '<div class="ring-pct" id="ringPct">0%</div>'+
+        '<div class="scan-stage" style="position:absolute;left:-10px;top:-12px;width:148px;height:152px;">'+
+          '<div class="scan-box" style="left:34px;top:18px;width:46px;height:30px;animation-delay:0s"></div>'+
+          '<div class="scan-box" style="left:50px;top:56px;width:40px;height:54px;animation-delay:.6s"></div>'+
+          '<div class="scan-box" style="left:30px;top:90px;width:60px;height:34px;animation-delay:1.2s"></div>'+
+        '</div>'+
+        '</div>';
+    }
+    if(step==='result'){
+      return renderDial(110, dialAngle(), false);
+    }
+    if(step==='coaching'){
+      var done = Object.keys(state.coachDone).filter(function(k){return state.coachDone[k];}).length;
+      return '<div class="dial-wrap"><div style="font-family:\'Noto Serif KR\',serif;font-size:2.4rem;font-weight:700;">'+done+' <span style="font-size:1.1rem;color:var(--ink-soft);">/ '+COACH.length+'</span></div><div class="dial-caption">오늘 완료한 챌린지</div></div>';
+    }
+    if(step==='report'){
+      return renderDial(120, dialAngle(), false);
+    }
+    return '';
+  }
+
+  // ---------------- Renderers: content + actions ----------------
+  function selectGenderCard(g){
+    state.gender = g;
+    render();
+  }
+  function selectBody(key){
+    state.bodyKey = key;
+    render();
+  }
+  function answerColor(field, value){
+    if(field==='warmCool'){ state.warmCool = value; state.colorStep = 1; }
+    else if(field==='brightSoft'){
+      state.brightSoft = value;
+      var wc = state.warmCool, bs = value;
+      if(wc==='warm' && bs==='bright') state.season='spring';
+      else if(wc==='warm' && bs==='soft') state.season='autumn';
+      else if(wc==='cool' && bs==='bright') state.season='winter';
+      else state.season='summer';
+      state.colorStep = 2;
+    }
+    render();
+  }
+  function toggleCoach(id){
+    state.coachDone[id] = !state.coachDone[id];
+    render();
+  }
+
+  function contentFor(step){
+    if(step==='splash'){
+      return '<div class="splash-wrap">'+
+        '<div class="splash-mark">GRACE<span> AI</span></div>'+
+        '<p class="splash-sub">마흔 이후, 진짜 나를 완성하는<br>AI 이미지 코칭</p>'+
+        '<div class="splash-tagline">신뢰 · 우아함 · 자아 일치</div>'+
+        '</div>';
+    }
+    if(step==='gender'){
+      var html = '<div class="eyebrow">STEP 1 · 트랙 선택</div>'+
+        '<h1 class="title">어떤 품격을 만들어갈까요?</h1>'+
+        '<p class="desc">선택한 트랙에 맞춰 진단과 코칭 방식이 달라져요.</p>'+
+        '<div class="option-stack">';
+      html += optionCard('male', state.gender==='male', 'shield', '남성 트랙', '신뢰와 성공의 이미지 · 골격 진단', 'navy');
+      html += optionCard('female', state.gender==='female', 'leaf', '여성 트랙', '우아함과 자아 일치 · 체형 코드 진단', 'rose');
+      html += '</div>';
+      return html;
+    }
+    if(step==='body'){
+      var html;
+      if(state.gender==='male'){
+        html = '<div class="eyebrow">STEP 2 · 골격 진단</div>'+
+          '<h1 class="title">전체적인 몸의 라인이<br>어떻게 느껴지나요?</h1>'+
+          '<p class="desc">근육·뼈·지방의 균형을 살펴봐요.</p>'+
+          '<div class="option-stack">';
+        html += plainOption('straight', state.bodyKey==='straight', '곧고 절제된 느낌', BODY_MALE.straight.label, 'navy');
+        html += plainOption('curve', state.bodyKey==='curve', '부드럽고 유연한 느낌', BODY_MALE.curve.label, 'navy');
+        html += plainOption('volume', state.bodyKey==='volume', '단단하고 볼륨감 있는 느낌', BODY_MALE.volume.label, 'navy');
+        html += '</div>';
+      } else {
+        html = '<div class="eyebrow">STEP 2 · 체형 코드 진단</div>'+
+          '<h1 class="title">볼륨이 가장 두드러지게<br>느껴지는 부분은?</h1>'+
+          '<p class="desc">입체적인 균형을 살펴봐요.</p>'+
+          '<div class="option-stack">';
+        html += plainOption('S', state.bodyKey==='S', '상체와 하체가 비슷해요', BODY_FEMALE.S.label, 'rose');
+        html += plainOption('W', state.bodyKey==='W', '한쪽에 볼륨이 있어요', BODY_FEMALE.W.label, 'rose');
+        html += plainOption('N', state.bodyKey==='N', '골격이 또렷하게 느껴져요', BODY_FEMALE.N.label, 'rose');
+        html += plainOption('B', state.bodyKey==='B', '전체적으로 볼륨감이 풍부해요', BODY_FEMALE.B.label, 'rose');
+        html += '</div>';
+      }
+      return html;
+    }
+    if(step==='color'){
+      var html = '<div class="eyebrow">STEP 3 · 퍼스널 컬러 진단</div>';
+      if(state.colorStep===0){
+        html += '<h1 class="title">어떤 톤이 더<br>편안하게 느껴지나요?</h1>'+
+          '<p class="desc">사계절 컬러로 당신의 톤을 찾아갑니다.</p>'+
+          '<div class="option-stack">'+
+          plainOption('warm', false, '따뜻한 톤', '베이지 · 코랄 · 카멜', accentTone(), 'warmCool')+
+          plainOption('cool', false, '차가운 톤', '블루 · 그레이 · 버건디', accentTone(), 'warmCool')+
+          '</div>';
+      } else if(state.colorStep===1){
+        html += '<h1 class="title">또렷한 컬러와<br>부드러운 컬러, 어느 쪽인가요?</h1>'+
+          '<p class="desc">대비감을 살펴보고 있어요.</p>'+
+          '<div class="option-stack">'+
+          plainOption('bright', false, '또렷하고 선명하게', '강한 대비가 편해요', accentTone(), 'brightSoft')+
+          plainOption('soft', false, '부드럽고 차분하게', '은은한 톤이 편해요', accentTone(), 'brightSoft')+
+          '</div>';
+      } else {
+        var s = SEASON[state.season];
+        html += '<h1 class="title">당신의 컬러는<br>'+s.label+'</h1>'+
+          '<p class="desc">'+s.tone+' · '+s.note+'</p>'+
+          '<div class="swatch-row">'+ s.colors.map(function(c){return '<div class="swatch" style="background:'+c+'"></div>';}).join('') +'</div>';
+      }
+      return html;
+    }
+    if(step==='analyzing'){
+      return '<div class="eyebrow">AI 매칭 중</div>'+
+        '<h1 class="title" id="analyzeCaption">체형 데이터를 분석하고 있어요</h1>'+
+        '<p class="desc">YOLO 기반 2단계 라벨링으로 상의·하의를 탐지하고, 세부 속성을 매칭하는 중이에요.</p>'+
+        '<div class="chip-row"><span class="chip gold">평균 매칭 정확도 96.29%</span></div>'+
+        '<button class="skip-link" id="skipBtn">결과 바로 보기</button>';
+    }
+    if(step==='result'){
+      var table = state.gender==='male' ? BODY_MALE : BODY_FEMALE;
+      var body = table[state.bodyKey];
+      var s = SEASON[state.season];
+      var tone = accentTone();
+      return '<div class="eyebrow">STEP 4 · AI 진단 결과</div>'+
+        '<h1 class="title">당신의 품격 코드</h1>'+
+        '<div class="chip-row">'+
+          '<span class="chip '+(tone==='rose'?'rose':'')+'">'+(state.gender==='male'?'남성 트랙':'여성 트랙')+'</span>'+
+          '<span class="chip '+(tone==='rose'?'rose':'')+'">'+body.label+'</span>'+
+          '<span class="chip gold">'+s.label+'</span>'+
+        '</div>'+
+        '<div class="result-card"><h3>골격·체형 특징</h3><p>'+body.desc+'</p></div>'+
+        '<div class="result-card"><h3>AI 추천 코디</h3><p>'+body.outfit+'</p>'+
+          '<div class="swatch-row">'+ s.colors.map(function(c){return '<div class="swatch" style="background:'+c+'"></div>';}).join('') +'</div>'+
+        '</div>'+
+        '<div class="result-card"><h3>이번 시즌 컬러 코칭</h3><p>'+s.tone+'. '+s.note+'</p></div>';
+    }
+    if(step==='coaching'){
+      var html = '<div class="eyebrow">STEP 5 · 통합 코칭</div>'+
+        '<h1 class="title">오늘의 통합 코칭</h1>'+
+        '<p class="desc">겉모습과 마음가짐을 함께 다듭니다. 가능한 만큼만 체크해도 충분해요.</p>';
+      COACH.forEach(function(c){
+        var done = !!state.coachDone[c.id];
+        html += '<div class="coach-card'+(done?' done':'')+'" onclick="GraceApp.toggleCoach(\''+c.id+'\')" role="checkbox" aria-checked="'+done+'" tabindex="0">'+
+          '<div class="coach-box">'+icon('check')+'</div>'+
+          '<div><p class="coach-title">'+c.title+'</p><p class="coach-desc">'+c.desc+'</p><span class="coach-tag">'+c.tag+'</span></div>'+
+        '</div>';
+      });
+      return html;
+    }
+    if(step==='report'){
+      var table = state.gender==='male' ? BODY_MALE : BODY_FEMALE;
+      var body = table[state.bodyKey];
+      var s = SEASON[state.season];
+      var done = Object.keys(state.coachDone).filter(function(k){return state.coachDone[k];}).length;
+      var msg = state.gender==='male'
+        ? '신뢰와 성공을 향한 단단한 한 걸음을 내디뎠습니다.'
+        : '있는 그대로의 우아함을 한 걸음 더 찾아갔습니다.';
+      return '<div class="eyebrow">완료</div>'+
+        '<h1 class="title">오늘의 품격 리포트</h1>'+
+        '<div class="report-card">'+
+          '<div class="report-row"><span>트랙</span><span>'+(state.gender==='male'?'남성 · 신뢰와 성공':'여성 · 우아함과 자아 일치')+'</span></div>'+
+          '<div class="report-row"><span>진단 코드</span><span>'+body.label+'</span></div>'+
+          '<div class="report-row"><span>퍼스널 컬러</span><span>'+s.label+'</span></div>'+
+          '<div class="report-row"><span>코칭 완료</span><span>'+done+' / '+COACH.length+'</span></div>'+
+        '</div>'+
+        '<p class="report-msg serif">'+msg+'</p>'+
+        '<div class="note-card">'+icon('info')+'<span>보정 없는 솔직한 모습이 가장 빛나요. 오늘은 꾸미지 않은 진짜 모습을 사진으로 남겨보세요.</span></div>';
+    }
+    return '';
+  }
+
+  function optionCard(value, selected, iconName, label, sub, tone){
+    var cls = 'option-card'+(tone==='rose'?' rose':'')+(selected?' selected'+(tone?' tone-'+tone:''):'');
+    return '<button class="'+cls+'" onclick="GraceApp.selectGender(\''+value+'\')">'+
+      '<div class="icon">'+icon(iconName)+'</div>'+
+      '<div style="flex:1;"><p class="label">'+label+'</p><p class="sub">'+sub+'</p></div>'+
+      '<div class="check-mark">'+icon('check')+'</div>'+
+    '</button>';
+  }
+  function plainOption(value, selected, label, sub, tone, colorField){
+    var cls = 'option-card'+(tone==='rose'?' rose':'')+(selected?' selected'+(tone?' tone-'+tone:''):'');
+    var handler = colorField ? "GraceApp.answerColor('"+colorField+"','"+value+"')" : "GraceApp.selectBody('"+value+"')";
+    return '<button class="'+cls+'" onclick="'+handler+'">'+
+      '<div style="flex:1;"><p class="label">'+label+'</p><p class="sub">'+sub+'</p></div>'+
+      '<div class="check-mark">'+icon('check')+'</div>'+
+    '</button>';
+  }
+
+  // ---------------- Action bars ----------------
+  function actionsFor(step){
+    var tone = accentTone();
+    var toneClass = tone ? ' tone-'+tone : '';
+    if(step==='splash'){
+      return '<button class="btn btn-primary" onclick="GraceApp.goNext()">시작하기</button>';
+    }
+    if(step==='gender'){
+      return '<button class="btn btn-primary'+toneClass+'" '+(state.gender?'':'disabled')+' onclick="GraceApp.goNext()">다음</button>';
+    }
+    if(step==='body'){
+      return '<button class="btn btn-primary'+toneClass+'" '+(state.bodyKey?'':'disabled')+' onclick="GraceApp.goNext()">다음</button>';
+    }
+    if(step==='color'){
+      if(state.colorStep<2) return '';
+      return '<button class="btn btn-primary'+toneClass+'" onclick="GraceApp.goNext()">AI 매칭 시작하기</button>';
+    }
+    if(step==='analyzing'){ return ''; }
+    if(step==='result'){
+      return '<button class="btn btn-primary'+toneClass+'" onclick="GraceApp.goNext()">데일리 코칭 시작하기</button>';
+    }
+    if(step==='coaching'){
+      return '<button class="btn btn-primary'+toneClass+'" onclick="GraceApp.goNext()">리포트 확인하기</button>';
+    }
+    if(step==='report'){
+      return '<button class="btn btn-primary'+toneClass+'" onclick="GraceApp.restart()">다시 진단하기</button>';
+    }
+    return '';
+  }
+
+  // ---------------- Navigation ----------------
+  function goNext(){
+    clearTimers();
+    if(state.stepIndex < STEPS.length-1){
+      state.stepIndex++;
+      render();
+      if(STEPS[state.stepIndex]==='analyzing') startAnalyzing();
+    }
+  }
+  function goBack(){
+    clearTimers();
+    var step = STEPS[state.stepIndex];
+    if(step==='color' && state.colorStep>0){
+      state.colorStep--; render(); return;
+    }
+    if(step==='analyzing'){ state.stepIndex--; render(); return; }
+    if(STEPS[state.stepIndex-1]==='analyzing'){ state.stepIndex -= 2; render(); return; }
+    if(state.stepIndex>0){ state.stepIndex--; render(); }
+  }
+  function restart(){
+    clearTimers();
+    state = {stepIndex:0, gender:null, bodyKey:null, colorStep:0, warmCool:null, brightSoft:null, season:null, coachDone:{}};
+    render();
+  }
+
+  function startAnalyzing(){
+    var captions = ['체형 데이터를 분석하고 있어요','컬러 데이터를 결합하고 있어요','최적의 코디를 매칭하고 있어요'];
+    var ci = 0;
+    var capEl = document.getElementById('analyzeCaption');
+    var t1 = setInterval(function(){
+      ci = (ci+1)%captions.length;
+      if(capEl) capEl.textContent = captions[ci];
+    }, 950);
+    timers.push(t1);
+
+    var ring = document.getElementById('ringProgress');
+    var pctEl = document.getElementById('ringPct');
+    var circumference = 339;
+    var pct = 0;
+    var t2 = setInterval(function(){
+      pct += 4;
+      if(pct>100) pct=100;
+      if(ring) ring.setAttribute('stroke-dashoffset', circumference - (circumference*pct/100));
+      if(pctEl) pctEl.textContent = pct+'%';
+      if(pct>=100){
+        clearInterval(t2);
+        var t3 = setTimeout(function(){ goNext(); }, 350);
+        timers.push(t3);
+      }
+    }, 100);
+    timers.push(t2);
+
+    var skip = document.getElementById('skipBtn');
+    if(skip) skip.addEventListener('click', function(){ goNext(); });
+  }
+
+  // ---------------- Master render ----------------
+  function render(){
+    var step = STEPS[state.stepIndex];
+    document.getElementById('visualZone').innerHTML = visualFor(step);
+    var cz = document.getElementById('contentZone');
+    cz.innerHTML = contentFor(step);
+    cz.classList.remove('fade-in'); void cz.offsetWidth; cz.classList.add('fade-in');
+    document.getElementById('actionBar').innerHTML = actionsFor(step);
+
+    // topbar
+    var backBtn = document.getElementById('backBtn');
+    var canGoBack = state.stepIndex>0 && step!=='splash' && step!=='analyzing';
+    backBtn.classList.toggle('show', canGoBack);
+    document.getElementById('brandMini').classList.toggle('show', step!=='splash');
+
+    var dotsEl = document.getElementById('dots');
+    var diagSteps = ['gender','body','color'];
+    if(diagSteps.indexOf(step)>-1){
+      dotsEl.innerHTML = diagSteps.map(function(s){return '<span class="dot'+(s===step?' active':'')+'"></span>';}).join('');
+    } else {
+      dotsEl.innerHTML = '';
+    }
+  }
+
+  // expose
+  window.GraceApp = {
+    goNext:goNext, goBack:goBack, restart:restart,
+    selectGender:selectGenderCard, selectBody:selectBody,
+    answerColor:answerColor, toggleCoach:toggleCoach
+  };
+
+  document.getElementById('backBtn').addEventListener('click', goBack);
+
+  render();
+})();
+</script>
+</body>
+</html>

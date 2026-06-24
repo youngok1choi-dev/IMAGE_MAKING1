@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>GRACE AI — 어른의 품격</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B2A33; --ink-soft:#736C72; --paper:#FBF7F1; --backdrop:#E9E2D6; --line:#E1D6C6;
+  --gold:#B6925B; --gold-deep:#8E7240; --gold-bg:#F4E9D6;
+  --navy:#22395C; --navy-soft:#E3E8EF;
+  --rose:#9C5E78; --rose-soft:#F1E1E8;
+  --good:#4C7A5E; --good-soft:#E6F2EB;
+  --danger:#B04040;
+  --radius-card:18px; --radius-btn:16px;
+  --shadow:0 18px 40px -16px rgba(43,42,51,0.28);
+  --shadow-sm:0 4px 16px -6px rgba(43,42,51,0.18);
+  /* 반응형 기준 크기 */
+  --fs-base:clamp(15px, 4vw, 17px);
+  --fs-sm:clamp(12px, 3.2vw, 14px);
+  --fs-md:clamp(14px, 3.8vw, 16px);
+  --fs-lg:clamp(16px, 4.2vw, 18px);
+  --fs-xl:clamp(20px, 5.5vw, 24px);
+  --fs-xxl:clamp(24px, 6.5vw, 30px);
+  --btn-h:clamp(50px, 13vw, 62px);
+  --tab-h:clamp(56px, 14vw, 68px);
+  --pad-h:clamp(16px, 4.5vw, 26px);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html{font-size:var(--fs-base); text-size-adjust:100%; -webkit-text-size-adjust:100%;}
+body{
+  margin:0; min-height:100dvh;
+  background:var(--backdrop);
+  background-image:radial-gradient(circle at 18% 12%,rgba(182,146,91,.10),transparent 45%),
+                   radial-gradient(circle at 84% 86%,rgba(34,57,92,.08),transparent 45%);
+  font-family:'Noto Sans KR',sans-serif; color:var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(0px,3vw,28px) clamp(0px,2vw,12px);
+  overscroll-behavior:none;
+}
+.serif{font-family:'Noto Serif KR',serif;}
+
+/* ── Device shell ── */
+.device{
+  width:100%; max-width:430px;
+  height:100dvh;
+  max-height:min(900px, 100dvh);
+  background:var(--paper); border-radius:clamp(0px,4vw,34px);
+  box-shadow:var(--shadow); border:1px solid rgba(43,42,51,.06);
+  display:flex; flex-direction:column; overflow:hidden; position:relative;
+}
+@media(min-width:500px){
+  body{padding:20px 12px;}
+  .device{height:min(900px,96dvh); border-radius:34px; box-shadow:var(--shadow);}
+}
+@media(max-width:499px){
+  body{padding:0;}
+  .device{border-radius:0; box-shadow:none; border:none; max-height:none;}
+}
+
+/* ── Topbar ── */
+.topbar{
+  flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+  padding:max(env(safe-area-inset-top,12px),14px) var(--pad-h) 8px;
+  min-height:52px; z-index:10;
+}
+.icon-btn{
+  width:clamp(36px,9vw,44px); height:clamp(36px,9vw,44px);
+  border-radius:50%; border:1px solid var(--line);
+  background:#fff; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--ink); flex-shrink:0;
+  touch-action:manipulation;
+}
+.icon-btn svg{width:clamp(18px,4.5vw,22px); height:clamp(18px,4.5vw,22px);}
+.icon-btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+.icon-btn.hidden{visibility:hidden;}
+.dots{display:flex; gap:7px; align-items:center;}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--line); transition:background .25s,transform .25s;}
+.dot.active{background:var(--gold); transform:scale(1.3);}
+.brandmini{font-size:clamp(.68rem,2.8vw,.78rem); letter-spacing:.14em; font-weight:700; color:var(--gold-deep);}
+.brandmini.hidden{visibility:hidden;}
+
+/* ── Zones (diagnosis) ── */
+.visual-zone{flex:0 0 36%; display:flex; align-items:center; justify-content:center; padding:6px var(--pad-h); overflow:hidden;}
+.content-zone{flex:1 1 auto; overflow-y:auto; padding:4px var(--pad-h) 10px; -webkit-overflow-scrolling:touch;}
+.action-bar{
+  flex:0 0 auto; padding:12px var(--pad-h) max(env(safe-area-inset-bottom,16px),18px);
+  display:flex; flex-direction:column; gap:10px;
+  border-top:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(251,247,241,.4),var(--paper) 35%);
+}
+
+/* ── Tab layout ── */
+.main-body{flex:1 1 auto; overflow:hidden; display:flex; flex-direction:column;}
+.tab-content{
+  flex:1 1 auto; overflow-y:auto;
+  padding:14px var(--pad-h) calc(env(safe-area-inset-bottom,0px) + 80px);
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+}
+.bottom-nav{
+  flex:0 0 auto; display:flex; align-items:stretch;
+  border-top:1px solid var(--line); background:var(--paper);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  min-height:var(--tab-h);
+}
+.nav-tab{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; padding:8px 2px max(env(safe-area-inset-bottom,8px),10px);
+  cursor:pointer; border:none; background:transparent;
+  color:var(--ink-soft); font-family:'Noto Sans KR',sans-serif;
+  font-size:clamp(.65rem,2.5vw,.72rem); font-weight:500;
+  position:relative; transition:color .15s;
+  touch-action:manipulation;
+}
+.nav-tab svg{width:clamp(20px,5.5vw,24px); height:clamp(20px,5.5vw,24px); transition:color .15s;}
+.nav-tab.active{color:var(--gold-deep);}
+.nav-tab.active::after{content:''; position:absolute; top:0; left:20%; right:20%; height:2.5px; background:var(--gold); border-radius:0 0 3px 3px;}
+.nav-tab.active-navy{color:var(--navy);}
+.nav-tab.active-navy::after{background:var(--navy);}
+.nav-tab.active-rose{color:var(--rose);}
+.nav-tab.active-rose::after{background:var(--rose);}
+
+/* ── Typography ── */
+.eyebrow{font-size:clamp(.72rem,2.8vw,.82rem); font-weight:700; letter-spacing:.08em; color:var(--ink-soft); margin:2px 0 8px;}
+h1.title{font-family:'Noto Serif KR',serif; font-size:clamp(1.2rem,5vw,1.5rem); line-height:1.35; font-weight:700; margin:0 0 8px;}
+p.desc{font-size:clamp(.86rem,3.4vw,.96rem); line-height:1.6; color:var(--ink-soft); margin:0 0 14px;}
+.section-title{font-size:clamp(.9rem,3.5vw,1.06rem); font-weight:700; margin:14px 0 10px; font-family:'Noto Serif KR',serif;}
+
+/* ── Buttons ── */
+.btn{
+  appearance:none; border:none; border-radius:var(--radius-btn);
+  min-height:var(--btn-h); padding:0 16px;
+  font-family:'Noto Sans KR',sans-serif; font-size:clamp(.9rem,3.6vw,1rem); font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  gap:8px; width:100%;
+  transition:transform .12s,opacity .2s;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none; user-select:none;
+}
+.btn:active{transform:scale(.98);}
+.btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+.btn-primary{background:var(--ink); color:#fff;}
+.btn-primary.tone-navy{background:var(--navy);}
+.btn-primary.tone-rose{background:var(--rose);}
+.btn-primary.tone-gold{background:var(--gold);}
+.btn-primary:disabled{background:#D9D2C4; color:#A39E91; cursor:not-allowed;}
+.btn-ghost{background:transparent; color:var(--ink-soft); font-weight:500; min-height:clamp(40px,10vw,48px);}
+.btn-sm{min-height:clamp(44px,11vw,52px); font-size:clamp(.84rem,3.2vw,.9rem); border-radius:14px; padding:0 14px;}
+
+/* ── Option cards ── */
+.option-stack{display:flex; flex-direction:column; gap:clamp(8px,2.5vw,12px); margin-bottom:8px;}
+.option-card{
+  border:1.5px solid var(--line); background:#fff; border-radius:var(--radius-card);
+  padding:clamp(12px,3.5vw,16px); display:flex; align-items:center; gap:12px;
+  cursor:pointer; text-align:left; width:100%;
+  transition:border-color .15s,background .15s,transform .1s;
+  font-family:'Noto Sans KR',sans-serif;
+  touch-action:manipulation;
+}
+.option-card:active{transform:scale(.99);}
+.option-card .oc-icon{flex:0 0 auto; width:clamp(38px,10vw,46px); height:clamp(38px,10vw,46px); border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--navy-soft); color:var(--navy);}
+.option-card.rose .oc-icon{background:var(--rose-soft); color:var(--rose);}
+.option-card .oc-icon svg{width:clamp(18px,5vw,22px); height:clamp(18px,5vw,22px);}
+.option-card .oc-label{font-size:clamp(.88rem,3.4vw,1rem); font-weight:700; color:var(--ink); margin:0 0 2px;}
+.option-card .oc-sub{font-size:clamp(.74rem,2.8vw,.84rem); color:var(--ink-soft); margin:0; line-height:1.45;}
+.option-card.selected{border-color:var(--gold); background:#FFFBF3;}
+.option-card.selected.tone-navy{border-color:var(--navy);}
+.option-card.selected.tone-rose{border-color:var(--rose);}
+.check-mark{flex:0 0 auto; width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center;}
+.option-card.selected .check-mark{background:var(--gold); border-color:var(--gold);}
+.option-card.selected.tone-navy .check-mark{background:var(--navy); border-color:var(--navy);}
+.option-card.selected.tone-rose .check-mark{background:var(--rose); border-color:var(--rose);}
+.check-mark svg{width:14px; height:14px; color:#fff; visibility:hidden;}
+.option-card.selected .check-mark svg{visibility:visible;}
+
+/* ── Splash ── */
+.splash-wrap{height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 var(--pad-h);}
+.splash-mark{font-family:'Noto Serif KR',serif; font-size:clamp(1.6rem,7vw,2.2rem); font-weight:700; letter-spacing:.04em;}
+.splash-mark span{color:var(--gold);}
+.splash-sub{font-size:clamp(.9rem,3.6vw,1.04rem); color:var(--ink-soft); margin:10px 0 0; line-height:1.6;}
+.splash-tagline{margin-top:24px; font-size:clamp(.74rem,2.8vw,.86rem); letter-spacing:.05em; color:var(--gold-deep); font-weight:700;}
+
+/* ── Dial ── */
+.dial-wrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.dial-caption{font-size:clamp(.74rem,2.8vw,.84rem); color:var(--ink-soft); font-weight:700; text-align:center;}
+
+/* ── Scan/ring ── */
+.ring-wrap{position:relative; width:clamp(100px,28vw,128px); height:clamp(100px,28vw,128px); display:flex; align-items:center; justify-content:center;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-pct{position:absolute; font-weight:900; font-size:clamp(1rem,4vw,1.3rem); color:var(--ink);}
+.scan-box{position:absolute; border:2px solid var(--gold); border-radius:6px; opacity:0; animation:scanblink 2.4s ease-in-out infinite;}
+@keyframes scanblink{0%,100%{opacity:0;}18%{opacity:1;}38%{opacity:0;}}
+
+/* ── Result cards ── */
+.result-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius-card); padding:clamp(12px,3.5vw,16px); margin-bottom:12px;}
+.result-card h3{margin:0 0 6px; font-size:clamp(.88rem,3.4vw,1rem); font-family:'Noto Serif KR',serif;}
+.result-card p{margin:0; font-size:clamp(.82rem,3.2vw,.9rem); line-height:1.55; color:var(--ink-soft);}
+.swatch-row{display:flex; gap:8px; margin-top:12px;}
+.swatch{width:clamp(24px,6vw,30px); height:clamp(24px,6vw,30px); border-radius:50%; border:1px solid rgba(0,0,0,.08);}
+
+/* ── Chips ── */
+.chip-row{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;}
+.chip{border-radius:999px; padding:5px 11px; font-size:clamp(.72rem,2.8vw,.8rem); font-weight:700; background:var(--navy-soft); color:var(--navy);}
+.chip.rose{background:var(--rose-soft); color:var(--rose);}
+.chip.gold{background:var(--gold-bg); color:var(--gold-deep);}
+
+/* ── Coaching ── */
+.coach-card{
+  display:flex; align-items:flex-start; gap:10px;
+  background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-card);
+  padding:clamp(12px,3.5vw,15px); margin-bottom:10px;
+  cursor:pointer; transition:border-color .15s,background .15s;
+  text-align:left; width:100%; font-family:'Noto Sans KR',sans-serif;
+  touch-action:manipulation;
+}
+.coach-card.done{border-color:var(--good); background:var(--good-soft);}
+.coach-box{flex:0 0 auto; width:26px; height:26px; border-radius:8px; border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center; margin-top:2px;}
+.coach-card.done .coach-box{background:var(--good); border-color:var(--good);}
+.coach-box svg{width:14px; height:14px; color:#fff; visibility:hidden;}
+.coach-card.done .coach-box svg{visibility:visible;}
+.coach-title{font-weight:700; font-size:clamp(.86rem,3.4vw,.96rem); margin:0 0 3px;}
+.coach-desc{font-size:clamp(.76rem,3vw,.84rem); color:var(--ink-soft); line-height:1.5; margin:0;}
+.coach-tag{display:inline-block; margin-top:6px; font-size:.72rem; font-weight:700; color:var(--gold-deep); background:var(--gold-bg); border-radius:8px; padding:2px 8px;}
+
+/* ── Report ── */
+.report-card{background:linear-gradient(160deg,#fff,#FBF4E8); border:1px solid var(--line); border-radius:20px; padding:clamp(14px,4vw,20px); margin-bottom:14px;}
+.report-row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed var(--line); font-size:clamp(.82rem,3.2vw,.9rem);}
+.report-row:last-child{border-bottom:none;}
+.report-row span:first-child{color:var(--ink-soft);}
+.report-row span:last-child{font-weight:700; text-align:right;}
+.report-msg{font-family:'Noto Serif KR',serif; font-size:clamp(.9rem,3.6vw,1.06rem); line-height:1.6; text-align:center; margin:6px 0 16px;}
+.note-card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:clamp(.76rem,3vw,.84rem); color:var(--ink-soft); line-height:1.55; display:flex; gap:10px; align-items:flex-start;}
+.note-card svg{flex:0 0 auto; width:18px; height:18px; color:var(--gold-deep); margin-top:1px;}
+
+/* ── Chat ── */
+.chat-wrap{display:flex; flex-direction:column; height:100%; overflow:hidden;}
+.chat-messages{flex:1 1 auto; overflow-y:auto; padding:8px 2px 8px; display:flex; flex-direction:column; gap:10px; overscroll-behavior-y:contain;}
+.msg-row{display:flex; gap:8px; align-items:flex-end;}
+.msg-row.user{flex-direction:row-reverse;}
+.msg-avatar{
+  flex:0 0 auto; width:clamp(30px,8vw,38px); height:clamp(30px,8vw,38px); border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-deep));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Noto Serif KR',serif; font-size:clamp(.68rem,2.8vw,.78rem); font-weight:700; color:#fff;
+  box-shadow:0 2px 8px rgba(182,146,91,.4); flex-shrink:0;
+}
+.msg-bubble{
+  max-width:78%; padding:clamp(10px,3vw,13px) clamp(12px,3.5vw,15px);
+  border-radius:18px 18px 18px 4px;
+  background:#fff; border:1px solid var(--line);
+  font-size:clamp(.84rem,3.4vw,.95rem); line-height:1.6; color:var(--ink);
+  word-break:break-word;
+}
+.msg-row.user .msg-bubble{border-radius:18px 18px 4px 18px; background:var(--navy); color:#fff; border:none;}
+.msg-row.user.rose .msg-bubble{background:var(--rose);}
+.typing-indicator{display:flex; gap:4px; align-items:center; padding:10px 12px;}
+.typing-dot{width:7px; height:7px; border-radius:50%; background:var(--ink-soft); animation:typingpulse 1.2s ease-in-out infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingpulse{0%,80%,100%{transform:scale(1);opacity:.5;}40%{transform:scale(1.3);opacity:1;}}
+
+/* Quick replies */
+.quick-row{display:flex; gap:6px; flex-wrap:wrap; padding:6px 0 4px;}
+.quick-chip{
+  border:1.5px solid var(--gold); background:#fff; border-radius:999px;
+  padding:7px 13px; font-size:clamp(.76rem,3vw,.86rem); font-weight:700; color:var(--gold-deep);
+  cursor:pointer; transition:background .12s,color .12s;
+  font-family:'Noto Sans KR',sans-serif; touch-action:manipulation;
+  white-space:nowrap;
+}
+.quick-chip:active{background:var(--gold); color:#fff;}
+.quick-chip.navy-style{border-color:var(--navy); color:var(--navy);}
+.quick-chip.navy-style:active{background:var(--navy); color:#fff;}
+.quick-chip.rose-style{border-color:var(--rose); color:var(--rose);}
+.quick-chip.rose-style:active{background:var(--rose); color:#fff;}
+
+/* Chat input */
+.chat-input-bar{
+  flex:0 0 auto; display:flex; align-items:center; gap:8px;
+  padding:8px var(--pad-h) max(env(safe-area-inset-bottom,10px),12px);
+  border-top:1px solid var(--line); background:var(--paper);
+}
+.chat-input-wrap{
+  flex:1; display:flex; align-items:center; gap:6px;
+  background:#fff; border:1.5px solid var(--line); border-radius:24px;
+  padding:6px 6px 6px 14px; min-height:46px;
+  transition:border-color .15s;
+}
+.chat-input-wrap:focus-within{border-color:var(--gold);}
+.chat-input-wrap.listening{border-color:var(--danger);}
+#chatInput{
+  flex:1; border:none; outline:none; background:transparent;
+  font-family:'Noto Sans KR',sans-serif; font-size:clamp(.88rem,3.4vw,.96rem); color:var(--ink);
+  resize:none; min-height:22px; max-height:88px; overflow-y:auto; line-height:1.5;
+}
+#chatInput::placeholder{color:#C4B9AE;}
+.voice-btn{
+  flex:0 0 auto; width:36px; height:36px; border-radius:50%; border:none;
+  background:var(--gold-bg); color:var(--gold-deep);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:background .15s,transform .1s; touch-action:manipulation;
+}
+.voice-btn:active{transform:scale(.92);}
+.voice-btn.listening{background:var(--danger); color:#fff; animation:pulse-ring .8s ease infinite;}
+.voice-btn svg{width:17px; height:17px;}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(176,64,64,.4);}70%{box-shadow:0 0 0 10px rgba(176,64,64,0);}100%{box-shadow:0 0 0 0 rgba(176,64,64,0);}}
+.send-btn{
+  flex:0 0 auto; width:44px; height:44px; border-radius:50%; border:none;
+  background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .15s,transform .12s; touch-action:manipulation;
+}
+.send-btn.tone-navy{background:var(--navy);}
+.send-btn.tone-rose{background:var(--rose);}
+.send-btn:active{transform:scale(.92);}
+.send-btn:disabled{background:#D9D2C4; cursor:not-allowed;}
+.send-btn svg{width:17px; height:17px;}
+.stt-badge{
+  display:none; align-items:center; gap:6px;
+  background:#fff; border:1px solid var(--danger); border-radius:10px;
+  padding:6px 12px; font-size:.8rem; font-weight:700; color:var(--danger);
+  position:absolute; bottom:76px; left:50%; transform:translateX(-50%);
+  white-space:nowrap; box-shadow:var(--shadow-sm); z-index:20;
+}
+.stt-badge.show{display:flex;}
+.stt-dot{width:8px; height:8px; border-radius:50%; background:var(--danger); animation:typingpulse .8s infinite;}
+
+/* Chat category tabs */
+.chat-cats{display:flex; gap:6px; overflow-x:auto; padding:8px 0 4px; scrollbar-width:none; -ms-overflow-style:none; flex-shrink:0;}
+.chat-cats::-webkit-scrollbar{display:none;}
+.cat-tab{flex:0 0 auto; border-radius:999px; padding:7px 13px; font-size:clamp(.7rem,2.8vw,.78rem); font-weight:700; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:background .12s,color .12s,border-color .12s; touch-action:manipulation; white-space:nowrap;}
+.cat-tab.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+.cat-tab.active-navy{background:var(--navy); color:#fff; border-color:var(--navy);}
+.cat-tab.active-rose{background:var(--rose); color:#fff; border-color:var(--rose);}
+
+/* Message share button */
+.msg-share-btn{
+  display:inline-flex; align-items:center; gap:4px; margin-top:7px;
+  border:1px solid var(--line); background:#fff; border-radius:999px;
+  padding:4px 10px; font-size:clamp(.66rem,2.6vw,.72rem); font-weight:700; color:var(--ink-soft);
+  cursor:pointer; font-family:'Noto Sans KR',sans-serif; touch-action:manipulation;
+  transition:background .12s,color .12s;
+}
+.msg-share-btn:active{background:var(--gold-bg); color:var(--gold-deep);}
+.msg-share-btn svg{width:12px; height:12px;}
+
+/* ── 공유 바텀시트 ── */
+.share-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:10000;
+  display:flex; align-items:flex-end; justify-content:center;
+  animation:fadeInOverlay .2s ease;
+}
+@keyframes fadeInOverlay{from{opacity:0;}to{opacity:1;}}
+.share-sheet{
+  background:#fff; border-radius:28px 28px 0 0;
+  padding:0 0 max(env(safe-area-inset-bottom,16px),16px);
+  width:100%; max-width:430px;
+  box-shadow:0 -8px 40px rgba(0,0,0,.2);
+  animation:slideUpSheet .28s cubic-bezier(.22,1,.36,1);
+  max-height:90dvh; overflow-y:auto;
+}
+@keyframes slideUpSheet{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.share-sheet-handle{width:40px; height:4px; background:#E1D6C6; border-radius:999px; margin:14px auto 0;}
+.share-preview{width:calc(100% - 40px); margin:14px 20px 0; border-radius:14px; overflow:hidden; max-height:160px; object-fit:cover; display:block; box-shadow:0 4px 16px rgba(0,0,0,.12);}
+.share-title{font-family:'Noto Serif KR',serif; font-size:clamp(.96rem,3.8vw,1.06rem); font-weight:700; text-align:center; padding:12px 20px 4px;}
+.share-desc{font-size:clamp(.76rem,3vw,.82rem); color:var(--ink-soft); text-align:center; padding:0 24px 10px; line-height:1.5;}
+.share-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 16px 8px;}
+.share-btn-item{
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  border:1.5px solid var(--line); border-radius:16px; padding:clamp(10px,3vw,14px) 8px;
+  cursor:pointer; background:#fff; font-family:'Noto Sans KR',sans-serif;
+  transition:background .12s,transform .1s; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.share-btn-item:active{transform:scale(.96); background:#F8F5F0;}
+.share-btn-item .sb-icon{width:clamp(38px,10vw,44px); height:clamp(38px,10vw,44px); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:2px;}
+.share-btn-item .sb-label{font-size:clamp(.74rem,2.8vw,.8rem); font-weight:700; color:var(--ink);}
+.share-btn-item .sb-sub{font-size:clamp(.62rem,2.4vw,.68rem); color:var(--ink-soft);}
+.share-full-btn{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin:4px 16px 8px; min-height:clamp(46px,12vw,54px);
+  border-radius:14px; font-size:clamp(.88rem,3.4vw,.96rem); font-weight:700;
+  cursor:pointer; border:none; font-family:'Noto Sans KR',sans-serif;
+  transition:opacity .15s,transform .1s; touch-action:manipulation;
+}
+.share-full-btn:active{transform:scale(.98); opacity:.85;}
+.share-close-btn{
+  width:calc(100% - 32px); margin:0 16px 8px;
+  min-height:clamp(44px,11vw,50px); border-radius:14px;
+  border:1.5px solid var(--line); background:#fff;
+  font-size:clamp(.88rem,3.4vw,.96rem); font-weight:500; color:var(--ink-soft);
+  cursor:pointer; font-family:'Noto Sans KR',sans-serif; touch-action:manipulation;
+  display:block;
+}
+
+/* Chat empty state */
+.chat-empty{display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; padding:0 var(--pad-h); gap:8px;}
+.chat-empty-icon{font-size:clamp(1.8rem,6vw,2.4rem);}
+.chat-empty-title{font-family:'Noto Serif KR',serif; font-size:clamp(.96rem,3.8vw,1.1rem); font-weight:700;}
+.chat-empty-sub{font-size:clamp(.78rem,3vw,.88rem); color:var(--ink-soft); line-height:1.55;}
+
+/* Animations */
+.fade-in{animation:fadein .32s ease both;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.skip-link{text-align:center; font-size:clamp(.76rem,3vw,.84rem); color:var(--ink-soft); text-decoration:underline; cursor:pointer; margin-top:12px; background:none; border:none; touch-action:manipulation;}
+
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important; transition-duration:.001ms!important;}}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <!-- Topbar -->
+  <div class="topbar" id="topbar">
+    <button class="icon-btn hidden" id="backBtn" aria-label="뒤로">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dots" id="dots"></div>
+    <div class="brandmini hidden" id="brandMini">GRACE AI</div>
+  </div>
+
+  <!-- DIAGNOSIS PHASE -->
+  <div id="diagPhase" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="visual-zone" id="visualZone"></div>
+    <div class="content-zone" id="contentZone"></div>
+    <div class="action-bar" id="actionBar"></div>
+  </div>
+
+  <!-- MAIN PHASE (tabs) -->
+  <div id="mainPhase" style="display:none;flex:1;flex-direction:column;overflow:hidden;" class="main-body">
+    <div class="tab-content" id="tabContent"></div>
+    <!-- STT badge -->
+    <div class="stt-badge" id="sttBadge">
+      <div class="stt-dot"></div><span id="sttText">듣고 있어요...</span>
+    </div>
+    <!-- Chat input (only visible on chatbot tab) -->
+    <div id="chatInputBar" style="display:none;">
+      <div class="chat-input-bar">
+        <div class="chat-input-wrap" id="chatInputWrap">
+          <textarea id="chatInput" rows="1" placeholder="무엇이든 물어보세요..."></textarea>
+          <button class="voice-btn" id="voiceBtn" aria-label="음성 입력">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3M9 22h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <button class="send-btn" id="sendBtn" aria-label="전송">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-tab" data-tab="result" onclick="GraceApp.switchTab('result')">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        AI 결과
+      </button>
+      <button class="nav-tab" data-tab="coaching" onclick="GraceApp.switchTab('coaching')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        코칭
+      </button>
+      <button class="nav-tab" data-tab="chatbot" onclick="GraceApp.switchTab('chatbot')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        AI 챗봇
+      </button>
+      <button class="nav-tab" data-tab="report" onclick="GraceApp.switchTab('report')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        리포트
+      </button>
+    </nav>
+  </div>
+</div>
+
+<script>
+(function(){"use strict";
+
+/* ═══════════════════ DATA ═══════════════════ */
+var BODY_MALE={
+  straight:{label:'직선형 골격',desc:'근육과 뼈의 윤곽이 또렷하고 절제된 라인의 골격이에요.',outfit:'어깨선이 살아 있는 슬림핏 재킷과 깔끔한 셔츠로 절제된 신뢰감을 더해보세요.',accessories:'각진 금속 프레임 안경과 단색 넥타이가 전문직 고정관념 이미지를 완성합니다.'},
+  curve:{label:'곡선형 골격',desc:'부드럽고 유연한 인상을 주는 골격이에요.',outfit:'부드러운 소재의 셋업과 라운드 칼라 셔츠로 편안하면서 단정한 인상을 만들어보세요.',accessories:'반원형 프레임 안경과 작은 패턴 넥타이가 친근한 전문가 이미지를 만들어요.'},
+  volume:{label:'볼륨형 골격',desc:'단단하고 볼륨감 있는 인상을 주는 골격이에요.',outfit:'여유 있는 핏의 재킷과 세로 패턴 셔츠로 안정감 있는 무게감을 표현해보세요.',accessories:'두꺼운 뿔테 안경과 폭이 넓은 넥타이가 신뢰감을 높여요.'}
+};
+var BODY_FEMALE={
+  S:{label:'스트레이트(S형)',desc:'상체와 하체의 균형이 또렷한 직선적인 체형이에요.',outfit:'허리 절개선이 있는 슬림한 원피스로 균형 잡힌 라인을 살려보세요.',tip:'A라인 스커트보다 직선 실루엣이 더 잘 어울려요.'},
+  W:{label:'웨이브(W형)',desc:'부드러운 곡선과 볼륨이 조화를 이루는 체형이에요.',outfit:'잘록한 허리를 강조하는 랩 원피스나 벨트 디테일로 우아한 곡선을 만들어보세요.',tip:'허리 라인을 살리되, 하체로 시선을 분산하는 플레어 스커트가 효과적이에요.'},
+  N:{label:'내추럴(N형)',desc:'골격이 또렷하게 느껴지는 자연스러운 체형이에요.',outfit:'편안한 실루엣의 셔츠 원피스나 와이드 팬츠로 자연스러운 멋을 더해보세요.',tip:'과한 장식보다 소재의 질감으로 고급스러움을 표현하는 것이 좋아요.'},
+  B:{label:'볼륨(B형)',desc:'전체적으로 풍성한 볼륨감을 가진 체형이에요.',outfit:'A라인 원피스나 부드럽게 떨어지는 소재로 우아하게 볼륨을 정리해보세요.',tip:'베스트나 카디건 레이어링으로 시선을 분산하는 코디가 효과적이에요.'}
+};
+var SEASON={
+  spring:{label:'봄 (Spring)',tone:'웜톤 · 화사함',colors:['#F3B79A','#FFD9A6','#FBEFD9'],note:'화사하고 생기 있는 컬러가 잘 어울려요. 피치, 코랄, 아이보리를 활용해보세요.'},
+  summer:{label:'여름 (Summer)',tone:'쿨톤 · 부드러움',colors:['#B7CBE0','#C9B8D6','#E7E4E0'],note:'은은하고 부드러운 컬러가 차분한 분위기를 더해줘요. 라벤더, 스카이 블루가 잘 맞아요.'},
+  autumn:{label:'가을 (Autumn)',tone:'웜톤 · 차분함',colors:['#B97A4A','#8C6239','#D8B98C'],note:'깊고 따뜻한 컬러가 안정감을 줘요. 카멜, 올리브, 테라코타를 시도해보세요.'},
+  winter:{label:'겨울 (Winter)',tone:'쿨톤 · 선명함',colors:['#2F4566','#7A1F33','#E7E7E7'],note:'선명하고 또렷한 컬러가 강한 인상을 만들어요. 네이비, 버건디, 화이트가 잘 어울려요.'}
+};
+var COACH=[
+  {id:'smile',title:'미소 훈련',desc:'아·에·이·오·우를 천천히 발음하며 입꼬리를 살짝 올려보세요. 하루 3분이면 충분해요.',tag:'1분 × 3회'},
+  {id:'voice',title:'발성 훈련',desc:'중요한 단어의 두 번째 음절에 살짝 힘을 주어 말해보세요. 신뢰감이 달라집니다.',tag:'2음절 강조'},
+  {id:'posture',title:'단단한 자세',desc:'어깨를 뒤로 당기고 정수리를 살짝 들어 올려 걸어보세요. 5m만 연습해도 달라져요.',tag:'자세 교정'},
+  {id:'mind',title:'마음가짐',desc:'오늘 대화한 사람의 입장에서 한 번 더 생각해보세요. 역지사지가 품격의 시작이에요.',tag:'내면 코칭'}
+];
+/* ══ 퀵 리플라이 — 6세트 순환 (남성) ══ */
+var QUICK_REPLIES_MALE=[
+  /* 0: 오늘 TPO */
+  ['오늘 회의 코디 추천해줘','출장 첫날 인상 어떻게 줄까?','중요한 미팅, 넥타이 색깔은?','저녁 모임용 수트 코디'],
+  /* 1: 체형·골격 */
+  ['내 골격에 맞는 재킷 핏은?','배가 좀 나왔는데 커버 방법은?','어깨가 넓은 편인데 어울리는 스타일?','다리가 짧아 보이지 않는 팬츠 추천'],
+  /* 2: 퍼스널 컬러 */
+  ['내 퍼스널 컬러로 넥타이 고르기','수트 색깔 어떤 게 나한테 맞아?','안경 프레임 컬러 추천해줘','셔츠 컬러 조합 알려줘'],
+  /* 3: 비언어·인상 */
+  ['자신감 있어 보이는 자세는?','목소리로 신뢰감 주는 방법','첫인상 좋아지는 3가지 팁','회의에서 돋보이는 법'],
+  /* 4: 시즌 코디 */
+  ['지금 계절에 맞는 수트 소재는?','더울 때도 단정하게 보이는 법','겨울 코트 + 수트 레이어링','계절별 컬러 활용 팁'],
+  /* 5: 내면·커리어 */
+  ['승진을 앞두고 이미지 바꾸고 싶어','임원 같은 포스 내는 방법','겸손하면서도 존재감 있는 법','나이보다 젊어 보이는 스타일']
+];
+
+/* ══ 퀵 리플라이 — 6세트 순환 (여성) ══ */
+var QUICK_REPLIES_FEMALE=[
+  /* 0: 오늘 TPO */
+  ['오늘 외출 코디 추천해줘','중요한 자리, 어떤 원피스가 좋을까?','친구 모임 스타일 추천','출장·비즈니스 미팅 코디'],
+  /* 1: 체형·커버 */
+  ['내 체형에 맞는 원피스 스타일은?','배와 허리 라인 커버 방법','어깨가 넓어 보이지 않는 네크라인?','다리 길어 보이는 하의 추천'],
+  /* 2: 퍼스널 컬러 */
+  ['내 퍼스널 컬러 활용법 자세히 알려줘','메이크업 컬러 어떻게 고를까?','피해야 할 컬러가 뭐야?','봄가을 시즌 컬러 조합 추천'],
+  /* 3: 비언어·인상 */
+  ['미소 근육 훈련 방법 알려줘','우아하게 걷는 자세는?','대화할 때 호감 주는 표정 연습','목소리 톤 어떻게 관리해?'],
+  /* 4: 자아 & 스타일링 */
+  ['나이보다 세련돼 보이는 법','40대인데 어떤 스타일이 어울려?','무난해 보이지 않고 눈에 띄는 코디','클래식하면서도 트렌디한 스타일'],
+  /* 5: 내면·자기관리 */
+  ['자존감 높아 보이는 이미지 만들기','직장에서 존중받는 이미지는?','나이 드는 게 걱정돼, 어떻게 가꿀까?','긍정적인 언어 습관 만드는 방법']
+];
+
+/* ══ 카테고리 탭 라벨 ══ */
+var CHAT_CATS_MALE =['오늘 코디','체형·골격','컬러','인상·발성','시즌 코디','이미지 전략'];
+var CHAT_CATS_FEMALE=['오늘 코디','체형·커버','컬러','인상·태도','스타일링','자기관리'];
+
+/* ═══════════════════ STATE ═══════════════════ */
+var DIAG_STEPS=['splash','gender','body','color','analyzing'];
+var state={
+  phase:'diagnosis', stepIndex:0,
+  gender:null, bodyKey:null,
+  colorStep:0, warmCool:null, brightSoft:null, season:null,
+  coachDone:{},
+  tab:'result',
+  chatHistory:[],
+  isTyping:false, quickSet:0,
+  sttActive:false
+};
+var timers=[];
+function clearTimers(){timers.forEach(function(t){clearTimeout(t);clearInterval(t);});timers=[];}
+
+/* ═══════════════════ HELPERS ═══════════════════ */
+function accentTone(){return state.gender==='male'?'navy':(state.gender==='female'?'rose':null);}
+function bodyData(){var t=state.gender==='male'?BODY_MALE:BODY_FEMALE; return t[state.bodyKey]||{};}
+function seasonData(){return SEASON[state.season]||{};}
+function svgIcon(name){
+  var d={
+    check:'<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    shield:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+    leaf:'<path d="M5 19c8 1 13-4 14-14C9 6 5 11 5 19z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+    info:'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 11v5M12 8v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+  };
+  return '<svg viewBox="0 0 24 24" fill="none">'+d[name]+'</svg>';
+}
+function dialSVG(size,angle,dim){
+  size=size||132; var op=dim?0.35:1;
+  return '<div class="dial-wrap">'+
+    '<svg width="'+size+'" height="'+size+'" viewBox="0 0 120 120" style="opacity:'+op+'">'+
+      '<path d="M60,60 L60,10 A50,50 0 0,1 110,60 Z" fill="#F3B79A"/>'+
+      '<path d="M60,60 L110,60 A50,50 0 0,1 60,110 Z" fill="#B97A4A"/>'+
+      '<path d="M60,60 L60,110 A50,50 0 0,1 10,60 Z" fill="#AFD3E0"/>'+
+      '<path d="M60,60 L10,60 A50,50 0 0,1 60,10 Z" fill="#2F4566"/>'+
+      '<circle cx="60" cy="60" r="50" fill="none" stroke="#fff" stroke-width="3"/>'+
+      '<g style="transform:rotate('+angle+'deg);transform-origin:60px 60px;transition:transform .6s cubic-bezier(.22,1,.36,1);">'+
+        '<polygon points="60,16 65,60 60,66 55,60" fill="#2B2A33"/>'+
+        '<circle cx="60" cy="60" r="7" fill="#fff" stroke="#2B2A33" stroke-width="2"/>'+
+      '</g>'+
+    '</svg></div>';
+}
+function dialAngle(){
+  if(state.colorStep===0)return 0;
+  if(state.colorStep===1)return state.warmCool==='warm'?90:270;
+  return {spring:45,autumn:135,summer:225,winter:315}[state.season]||0;
+}
+function nowTime(){var d=new Date();return d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();}
+
+/* ═══════════════════ VISUAL ZONE (diagnosis) ═══════════════════ */
+function visualFor(step){
+  if(step==='splash')return dialSVG(150,30,true);
+  if(step==='gender')return '<svg width="118" height="130" viewBox="0 0 118 130" fill="none"><ellipse cx="59" cy="34" rx="22" ry="24" stroke="#B6925B" stroke-width="2"/><path d="M20 124c2-30 16-46 39-46s37 16 39 46" stroke="#B6925B" stroke-width="2" stroke-linecap="round"/></svg>';
+  if(step==='body'){var t=state.gender==='male'?'#22395C':'#9C5E78';return '<svg width="100" height="140" viewBox="0 0 100 140" fill="none"><circle cx="50" cy="22" r="16" stroke="'+t+'" stroke-width="2.2"/><path d="M50 38v46M28 56h44M30 138l14-54M70 138l-14-54" stroke="'+t+'" stroke-width="2.2" stroke-linecap="round"/></svg>';}
+  if(step==='color')return dialSVG(150,dialAngle(),false)+'<div class="dial-caption">'+(state.season?SEASON[state.season].label:(state.colorStep===1?(state.warmCool==='warm'?'웜톤으로...':'쿨톤으로...'):'톤을 살펴보고 있어요'))+'</div>';
+  if(step==='analyzing')return '<div class="ring-wrap" style="position:relative;"><svg width="128" height="128"><circle cx="64" cy="64" r="54" stroke="#E1D6C6" stroke-width="8" fill="none"/><circle id="ringProgress" cx="64" cy="64" r="54" stroke="#B6925B" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="339"/></svg><div class="ring-pct" id="ringPct">0%</div><div style="position:absolute;left:-10px;top:-12px;width:148px;height:152px;pointer-events:none;"><div class="scan-box" style="left:34px;top:18px;width:46px;height:30px;"></div><div class="scan-box" style="left:50px;top:56px;width:40px;height:54px;animation-delay:.6s"></div><div class="scan-box" style="left:30px;top:90px;width:60px;height:34px;animation-delay:1.2s"></div></div></div>';
+  return '';
+}
+
+/* ═══════════════════ CONTENT ZONE (diagnosis) ═══════════════════ */
+function optionCard(value,selected,iconName,label,sub,tone,handler){
+  var roseClass=tone==='rose'?' rose':'';
+  var selClass=selected?(' selected'+(tone?' tone-'+tone:'')):'';
+  return '<button class="option-card'+roseClass+selClass+'" onclick="'+handler+'">'+
+    '<div class="oc-icon">'+svgIcon(iconName)+'</div>'+
+    '<div style="flex:1"><p class="oc-label">'+label+'</p><p class="oc-sub">'+sub+'</p></div>'+
+    '<div class="check-mark">'+svgIcon('check')+'</div>'+
+  '</button>';
+}
+function plainCard(value,selected,label,sub,tone,handler){
+  var roseClass=tone==='rose'?' rose':'';
+  var selClass=selected?(' selected'+(tone?' tone-'+tone:'')):'';
+  return '<button class="option-card'+roseClass+selClass+'" onclick="'+handler+'">'+
+    '<div style="flex:1"><p class="oc-label">'+label+'</p><p class="oc-sub">'+sub+'</p></div>'+
+    '<div class="check-mark">'+svgIcon('check')+'</div>'+
+  '</button>';
+}
+function contentFor(step){
+  if(step==='splash')return '<div class="splash-wrap"><div class="splash-mark">GRACE<span> AI</span></div><p class="splash-sub">마흔 이후, 진짜 나를 완성하는<br>AI 이미지 코칭</p><div class="splash-tagline">신뢰 · 우아함 · 자아 일치</div></div>';
+  if(step==='gender')return '<div class="eyebrow">STEP 1 · 트랙 선택</div><h1 class="title">어떤 품격을 만들어갈까요?</h1><p class="desc">선택에 따라 진단과 코칭이 달라져요.</p><div class="option-stack">'+
+    optionCard('male',state.gender==='male','shield','남성 트랙','신뢰와 성공의 이미지 · 골격 진단','navy',"GraceApp.selectGender('male')")+
+    optionCard('female',state.gender==='female','leaf','여성 트랙','우아함과 자아 일치 · 체형 코드 진단','rose',"GraceApp.selectGender('female')")+
+    '</div>';
+  if(step==='body'){
+    var tone=accentTone();
+    if(state.gender==='male')return '<div class="eyebrow">STEP 2 · 골격 진단</div><h1 class="title">몸의 전체 라인이<br>어떻게 느껴지나요?</h1><p class="desc">근육·뼈·지방의 질감을 살펴봐요.</p><div class="option-stack">'+
+      plainCard('straight',state.bodyKey==='straight','곧고 절제된 느낌','뼈와 근육의 윤곽이 또렷해요',tone,"GraceApp.selectBody('straight')")+
+      plainCard('curve',state.bodyKey==='curve','부드럽고 유연한 느낌','라인이 둥글고 유연해요',tone,"GraceApp.selectBody('curve')")+
+      plainCard('volume',state.bodyKey==='volume','단단하고 볼륨감 있는 느낌','전체적으로 무게감이 있어요',tone,"GraceApp.selectBody('volume')")+
+      '</div>';
+    return '<div class="eyebrow">STEP 2 · 체형 코드 진단</div><h1 class="title">볼륨이 두드러지는<br>부분은 어디인가요?</h1><p class="desc">16가지 체형 코드로 나를 찾아봐요.</p><div class="option-stack">'+
+      plainCard('S',state.bodyKey==='S','상하체 균형 비슷해요','스트레이트 직선형 실루엣',tone,"GraceApp.selectBody('S')")+
+      plainCard('W',state.bodyKey==='W','한쪽에 볼륨이 있어요','허리가 잘록한 웨이브형',tone,"GraceApp.selectBody('W')")+
+      plainCard('N',state.bodyKey==='N','골격이 또렷하게 느껴져요','자연스러운 내추럴형',tone,"GraceApp.selectBody('N')")+
+      plainCard('B',state.bodyKey==='B','전체적으로 볼륨이 풍부해요','풍성한 볼륨형',tone,"GraceApp.selectBody('B')")+
+      '</div>';
+  }
+  if(step==='color'){
+    var tone=accentTone();
+    var html='<div class="eyebrow">STEP 3 · 퍼스널 컬러</div>';
+    if(state.colorStep===0)return html+'<h1 class="title">어떤 톤이 더<br>편안하게 느껴지나요?</h1><p class="desc">사계절 컬러로 나만의 톤을 찾아요.</p><div class="option-stack">'+
+      plainCard('warm',false,'따뜻한 톤이 편해요','베이지·코랄·카멜',tone,"GraceApp.answerColor('warmCool','warm')")+
+      plainCard('cool',false,'차가운 톤이 편해요','블루·그레이·버건디',tone,"GraceApp.answerColor('warmCool','cool')")+
+      '</div>';
+    if(state.colorStep===1)return html+'<h1 class="title">또렷한 컬러와<br>부드러운 컬러, 어느 쪽인가요?</h1><p class="desc">대비감을 확인해요.</p><div class="option-stack">'+
+      plainCard('bright',false,'또렷하고 선명하게','강한 대비가 편해요',tone,"GraceApp.answerColor('brightSoft','bright')")+
+      plainCard('soft',false,'부드럽고 차분하게','은은한 톤이 편해요',tone,"GraceApp.answerColor('brightSoft','soft')")+
+      '</div>';
+    var s=SEASON[state.season];
+    return html+'<h1 class="title">당신의 컬러는<br><span class="serif">'+s.label+'</span></h1>'+
+      '<p class="desc">'+s.tone+' · '+s.note+'</p>'+
+      '<div class="swatch-row">'+s.colors.map(function(c){return'<div class="swatch" style="background:'+c+'"></div>';}).join('')+'</div>';
+  }
+  if(step==='analyzing')return '<div class="eyebrow">AI 매칭 중</div><h1 class="title" id="analyzeCaption">체형 데이터를 분석하고 있어요</h1><p class="desc">YOLO 2단계 계층적 라벨링으로 상의·하의를 탐지하고 세부 속성을 매칭합니다.</p><div class="chip-row"><span class="chip gold">YOLO 매칭 정확도 96.29%</span></div><button class="skip-link" id="skipBtn">결과 바로 보기</button>';
+  return '';
+}
+function actionsFor(step){
+  var t=accentTone(); var tc=t?' tone-'+t:'';
+  if(step==='splash')return '<button class="btn btn-primary" onclick="GraceApp.goNext()">시작하기</button>';
+  if(step==='gender')return '<button class="btn btn-primary'+tc+'" '+(state.gender?'':'disabled')+' onclick="GraceApp.goNext()">다음</button>';
+  if(step==='body')return '<button class="btn btn-primary'+tc+'" '+(state.bodyKey?'':'disabled')+' onclick="GraceApp.goNext()">다음</button>';
+  if(step==='color')return state.colorStep<2?'':(''+'<button class="btn btn-primary'+tc+'" onclick="GraceApp.goNext()">AI 매칭 시작하기</button>');
+  return '';
+}
+
+/* ═══════════════════ OUTFIT ILLUSTRATIONS ═══════════════════ */
+var OUTFIT_SVG={
+  /* ── 남성 ── */
+  male_straight:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    // body/torso jacket
+    '<path d="M45 68 L30 80 L28 160 L72 160 L72 68 Z" fill="#E3E8EF" stroke="#22395C" stroke-width="1.6" stroke-linejoin="round"/>'+
+    '<path d="M115 68 L130 80 L132 160 L88 160 L88 68 Z" fill="#E3E8EF" stroke="#22395C" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // shirt / inner
+    '<rect x="70" y="65" width="20" height="95" fill="#fff" stroke="#22395C" stroke-width="1.2"/>'+
+    // lapels
+    '<path d="M72 68 L80 90 L88 68 L95 58 L80 72 L65 58 Z" fill="#CBD4E0" stroke="#22395C" stroke-width="1.4" stroke-linejoin="round"/>'+
+    // collar
+    '<path d="M74 62 L80 74 L86 62" stroke="#22395C" stroke-width="1.4" fill="#fff" stroke-linejoin="round"/>'+
+    // tie
+    '<path d="M80 75 L77 110 L80 118 L83 110 Z" fill="#22395C"/>'+
+    '<path d="M78 74 L82 74 L80 80 Z" fill="#1a2d4a"/>'+
+    // trousers
+    '<rect x="66" y="158" width="24" height="40" rx="2" fill="#CBD4E0" stroke="#22395C" stroke-width="1.4"/>'+
+    '<rect x="90" y="158" width="24" height="40" rx="2" fill="#CBD4E0" stroke="#22395C" stroke-width="1.4"/>'+
+    // head
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    // hair
+    '<path d="M62 40 Q80 28 98 40 Q96 30 80 27 Q64 30 62 40Z" fill="#5C3A1E"/>'+
+    // glasses
+    '<rect x="70" y="44" width="10" height="7" rx="3" stroke="#22395C" stroke-width="1.4" fill="rgba(34,57,92,0.08)"/>'+
+    '<rect x="82" y="44" width="10" height="7" rx="3" stroke="#22395C" stroke-width="1.4" fill="rgba(34,57,92,0.08)"/>'+
+    '<line x1="80" y1="47" x2="82" y2="47" stroke="#22395C" stroke-width="1.2"/>'+
+    // label
+    '<text x="80" y="194" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">슬림핏 수트</text>'+
+    '</svg>',
+
+  male_curve:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    '<path d="M42 72 Q30 85 28 160 L132 160 Q130 85 118 72 Q100 68 80 68 Q60 68 42 72Z" fill="#E3E8EF" stroke="#22395C" stroke-width="1.6"/>'+
+    // collar round
+    '<path d="M68 68 Q80 78 92 68" stroke="#22395C" stroke-width="1.6" fill="none" stroke-linecap="round"/>'+
+    '<path d="M68 68 L72 160 L88 160 L92 68" fill="#fff" stroke="#22395C" stroke-width="1.2"/>'+
+    // buttons
+    '<circle cx="80" cy="90" r="2" fill="#22395C"/>'+
+    '<circle cx="80" cy="102" r="2" fill="#22395C"/>'+
+    '<circle cx="80" cy="114" r="2" fill="#22395C"/>'+
+    // trousers
+    '<rect x="64" y="158" width="27" height="40" rx="3" fill="#CBD4E0" stroke="#22395C" stroke-width="1.4"/>'+
+    '<rect x="92" y="158" width="27" height="40" rx="3" fill="#CBD4E0" stroke="#22395C" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M62 38 Q80 26 98 38 Q96 28 80 25 Q64 28 62 38Z" fill="#3D2B1A"/>'+
+    '<line x1="70" y1="46" x2="90" y2="46" stroke="#C4A882" stroke-width="0.8" opacity="0.5"/>'+
+    '<text x="80" y="194" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">라운드 칼라 셋업</text>'+
+    '</svg>',
+
+  male_volume:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    '<path d="M35 65 L20 82 L22 160 L75 160 L75 65 Z" fill="#D5DCE8" stroke="#22395C" stroke-width="1.6" stroke-linejoin="round"/>'+
+    '<path d="M125 65 L140 82 L138 160 L85 160 L85 65 Z" fill="#D5DCE8" stroke="#22395C" stroke-width="1.6" stroke-linejoin="round"/>'+
+    '<rect x="73" y="63" width="14" height="97" fill="#fff" stroke="#22395C" stroke-width="1.2"/>'+
+    '<path d="M75 65 L80 86 L85 65 L93 54 L80 70 L67 54 Z" fill="#BCC6D6" stroke="#22395C" stroke-width="1.4" stroke-linejoin="round"/>'+
+    '<path d="M75 60 L80 72 L85 60" stroke="#22395C" stroke-width="1.4" fill="#fff" stroke-linejoin="round"/>'+
+    // bold tie
+    '<path d="M80 73 L76 112 L80 122 L84 112 Z" fill="#1a2d4a"/>'+
+    '<path d="M77 72 L83 72 L80 78 Z" fill="#0d1f33"/>'+
+    // wide trousers
+    '<rect x="60" y="158" width="28" height="40" rx="2" fill="#BCC6D6" stroke="#22395C" stroke-width="1.4"/>'+
+    '<rect x="90" y="158" width="28" height="40" rx="2" fill="#BCC6D6" stroke="#22395C" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="44" r="21" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M60 37 Q80 23 100 37 Q98 26 80 23 Q62 26 60 37Z" fill="#2C1A0E"/>'+
+    // thick glasses frame
+    '<rect x="68" y="42" width="11" height="8" rx="2" stroke="#2C1A0E" stroke-width="2" fill="rgba(44,26,14,0.06)"/>'+
+    '<rect x="81" y="42" width="11" height="8" rx="2" stroke="#2C1A0E" stroke-width="2" fill="rgba(44,26,14,0.06)"/>'+
+    '<line x1="79" y1="46" x2="81" y2="46" stroke="#2C1A0E" stroke-width="2"/>'+
+    '<text x="80" y="194" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">여유핏 재킷</text>'+
+    '</svg>',
+
+  /* ── 여성 ── */
+  female_S:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    // straight dress
+    '<path d="M55 72 L50 75 L48 190 L112 190 L110 75 L105 72 Z" fill="#C9B8D6" stroke="#9C5E78" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // waist seam
+    '<line x1="50" y1="118" x2="110" y2="118" stroke="#9C5E78" stroke-width="1.4" stroke-dasharray="3,2"/>'+
+    // collar v-neck
+    '<path d="M67 72 L80 92 L93 72" fill="#B5A0C6" stroke="#9C5E78" stroke-width="1.4" stroke-linejoin="round"/>'+
+    // sleeves
+    '<path d="M55 72 L38 100 L44 102 L56 78" fill="#C9B8D6" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<path d="M105 72 L122 100 L116 102 L104 78" fill="#C9B8D6" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M62 44 Q80 28 98 44 Q90 32 80 30 Q70 32 62 44Z" fill="#3D2219"/>'+
+    '<path d="M62 46 Q64 52 66 54" stroke="#3D2219" stroke-width="3" stroke-linecap="round"/>'+
+    '<path d="M98 46 Q96 52 94 54" stroke="#3D2219" stroke-width="3" stroke-linecap="round"/>'+
+    '<text x="80" y="197" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">슬림핏 원피스</text>'+
+    '</svg>',
+
+  female_W:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    // wrap dress - flared skirt
+    '<path d="M60 72 L48 76 L36 190 L124 190 L112 76 L100 72 Z" fill="#F1E1E8" stroke="#9C5E78" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // waist belt
+    '<rect x="52" y="112" width="56" height="12" rx="4" fill="#9C5E78"/>'+
+    '<circle cx="80" cy="118" r="4" fill="#B6925B" stroke="#8E7240" stroke-width="1"/>'+
+    // V wrap line
+    '<path d="M68 72 L80 108 M92 72 L80 108" stroke="#9C5E78" stroke-width="1.8" stroke-linecap="round"/>'+
+    // sleeves
+    '<path d="M60 72 L44 96 L50 100 L62 80" fill="#F1E1E8" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<path d="M100 72 L116 96 L110 100 L98 80" fill="#F1E1E8" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M62 44 Q80 28 98 44 Q90 30 80 28 Q70 30 62 44Z" fill="#5C2D1E"/>'+
+    '<path d="M63 50 Q68 60 70 58" stroke="#5C2D1E" stroke-width="4" stroke-linecap="round"/>'+
+    '<path d="M97 50 Q92 60 90 58" stroke="#5C2D1E" stroke-width="4" stroke-linecap="round"/>'+
+    '<text x="80" y="197" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">랩 원피스</text>'+
+    '</svg>',
+
+  female_N:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    // shirt top
+    '<path d="M55 70 L44 78 L42 120 L118 120 L116 78 L105 70 Z" fill="#E9E2D6" stroke="#9C5E78" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // shirt collar & placket
+    '<path d="M68 70 L80 84 L92 70" fill="#D9D0C4" stroke="#9C5E78" stroke-width="1.4" stroke-linejoin="round"/>'+
+    '<line x1="80" y1="84" x2="80" y2="120" stroke="#9C5E78" stroke-width="1.2" stroke-dasharray="2,2"/>'+
+    // shirt buttons
+    '<circle cx="80" cy="92" r="2" fill="#9C5E78"/>'+
+    '<circle cx="80" cy="103" r="2" fill="#9C5E78"/>'+
+    '<circle cx="80" cy="114" r="2" fill="#9C5E78"/>'+
+    // wide pants
+    '<path d="M42 120 L34 190 L74 190 L80 145 L86 190 L126 190 L118 120 Z" fill="#D5CCE0" stroke="#9C5E78" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // sleeves
+    '<path d="M55 70 L40 98 L46 102 L57 78" fill="#E9E2D6" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<path d="M105 70 L120 98 L114 102 L103 78" fill="#E9E2D6" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M62 42 Q80 27 98 42 Q88 30 80 28 Q72 30 62 42Z" fill="#2C1A0E"/>'+
+    '<path d="M62 50 Q66 58 68 56" stroke="#2C1A0E" stroke-width="3.5" stroke-linecap="round"/>'+
+    '<path d="M98 50 Q94 58 92 56" stroke="#2C1A0E" stroke-width="3.5" stroke-linecap="round"/>'+
+    '<text x="80" y="197" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">셔츠 + 와이드 팬츠</text>'+
+    '</svg>',
+
+  female_B:
+    '<svg width="160" height="200" viewBox="0 0 160 200" fill="none">'+
+    // A-line dress
+    '<path d="M58 70 L48 76 L30 190 L130 190 L112 76 L102 70 Z" fill="#E8D5DC" stroke="#9C5E78" stroke-width="1.6" stroke-linejoin="round"/>'+
+    // empire waist line
+    '<path d="M50 96 Q80 100 110 96" stroke="#9C5E78" stroke-width="1.6" fill="none"/>'+
+    // bodice detail
+    '<path d="M66 70 L80 90 L94 70" fill="#DEC0CB" stroke="#9C5E78" stroke-width="1.4" stroke-linejoin="round"/>'+
+    // flare lines on skirt
+    '<line x1="60" y1="100" x2="36" y2="188" stroke="#9C5E78" stroke-width="0.8" opacity="0.5"/>'+
+    '<line x1="80" y1="100" x2="80" y2="188" stroke="#9C5E78" stroke-width="0.8" opacity="0.5"/>'+
+    '<line x1="100" y1="100" x2="124" y2="188" stroke="#9C5E78" stroke-width="0.8" opacity="0.5"/>'+
+    // sleeves
+    '<path d="M58 70 L42 94 L48 98 L60 78" fill="#E8D5DC" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<path d="M102 70 L118 94 L112 98 L100 78" fill="#E8D5DC" stroke="#9C5E78" stroke-width="1.4"/>'+
+    '<circle cx="80" cy="46" r="20" fill="#F5DCC8" stroke="#C4A882" stroke-width="1.4"/>'+
+    '<path d="M62 44 Q80 29 98 44 Q90 31 80 29 Q70 31 62 44Z" fill="#4A2416"/>'+
+    '<path d="M63 48 Q66 56 68 55" stroke="#4A2416" stroke-width="4" stroke-linecap="round"/>'+
+    '<path d="M97 48 Q94 56 92 55" stroke="#4A2416" stroke-width="4" stroke-linecap="round"/>'+
+    '<text x="80" y="197" text-anchor="middle" font-size="9" fill="#736C72" font-family="sans-serif">A라인 원피스</text>'+
+    '</svg>'
+};
+
+/* ═══════════════════ COLOR PALETTE VISUALS ═══════════════════ */
+var COLOR_PALETTE={
+  spring:{
+    colors:[
+      {hex:'#F3B79A',name:'피치',desc:'화사한 볼 터치'},
+      {hex:'#F5C87A',name:'골든 코랄',desc:'활기찬 포인트'},
+      {hex:'#FFE8C8',name:'아이보리',desc:'베이스 톤'},
+      {hex:'#E8A090',name:'살몬 핑크',desc:'립·볼 메이크업'}
+    ],
+    avoid:{hex:'#8BA4B8',name:'블루 그레이',desc:'피해야 할 톤'}
+  },
+  summer:{
+    colors:[
+      {hex:'#B7CBE0',name:'스카이 블루',desc:'시원한 베이스'},
+      {hex:'#C9B8D6',name:'라벤더',desc:'우아한 포인트'},
+      {hex:'#D4CCCA',name:'로즈 그레이',desc:'세련된 뉴트럴'},
+      {hex:'#E8D8E2',name:'블러시',desc:'립·볼 메이크업'}
+    ],
+    avoid:{hex:'#D4A45C',name:'카멜 옐로',desc:'피해야 할 톤'}
+  },
+  autumn:{
+    colors:[
+      {hex:'#B97A4A',name:'카멜',desc:'가장 잘 어울려요'},
+      {hex:'#8C6239',name:'초콜릿',desc:'무게감 있는 포인트'},
+      {hex:'#D4A96A',name:'머스타드',desc:'활력 있는 포인트'},
+      {hex:'#C47D5A',name:'테라코타',desc:'립·볼 메이크업'}
+    ],
+    avoid:{hex:'#B7CBE0',name:'파스텔 블루',desc:'피해야 할 톤'}
+  },
+  winter:{
+    colors:[
+      {hex:'#2F4566',name:'네이비',desc:'가장 잘 어울려요'},
+      {hex:'#7A1F33',name:'버건디',desc:'강렬한 포인트'},
+      {hex:'#F2F2F2',name:'화이트',desc:'밝은 베이스'},
+      {hex:'#1A1A2E',name:'블랙',desc:'선명한 대비'}
+    ],
+    avoid:{hex:'#D4A96A',name:'머스타드',desc:'피해야 할 톤'}
+  }
+};
+
+function outfitIllustration(){
+  var key=(state.gender==='male'?'male':'female')+'_'+state.bodyKey;
+  return OUTFIT_SVG[key]||'';
+}
+
+function colorPaletteHTML(){
+  var p=COLOR_PALETTE[state.season]; if(!p)return '';
+  var rows=p.colors.map(function(c){
+    return '<div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;">'+
+      '<div style="width:100%;aspect-ratio:1;border-radius:12px;background:'+c.hex+';box-shadow:0 2px 8px rgba(0,0,0,.12);"></div>'+
+      '<div style="font-size:.74rem;font-weight:700;color:var(--ink);text-align:center;line-height:1.3;">'+c.name+'</div>'+
+      '<div style="font-size:.68rem;color:var(--ink-soft);text-align:center;line-height:1.3;">'+c.desc+'</div>'+
+    '</div>';
+  }).join('');
+  var avoidHtml='<div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;background:#fafafa;border-radius:10px;border:1px dashed var(--line);">'+
+    '<div style="width:28px;height:28px;border-radius:50%;background:'+p.avoid.hex+';flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.1);"></div>'+
+    '<div><div style="font-size:.78rem;font-weight:700;color:var(--ink-soft);">피해야 할 컬러 · '+p.avoid.name+'</div>'+
+    '<div style="font-size:.72rem;color:#aaa;">'+p.avoid.desc+'</div></div>'+
+    '</div>';
+  return '<div style="display:flex;gap:8px;margin-bottom:4px;">'+rows+'</div>'+avoidHtml;
+}
+
+/* ═══════════════════ TAB CONTENTS ═══════════════════ */
+function renderResult(){
+  var bd=bodyData(); var s=seasonData(); var tone=accentTone();
+  var toneChip=tone==='rose'?' rose':'';
+  var extra=state.gender==='male'?(bd.accessories||''):(bd.tip||'');
+
+  // Outfit illustration block
+  var outfitSVGHtml=outfitIllustration();
+  var outfitVisual=outfitSVGHtml
+    ? '<div style="display:flex;justify-content:center;align-items:flex-end;gap:0;margin:10px 0 8px;">'+
+        '<div style="flex:0 0 auto;">'+outfitSVGHtml+'</div>'+
+      '</div>'
+    : '';
+
+  // Color palette block
+  var colorVisual=colorPaletteHTML();
+
+  return '<div class="eyebrow">AI 진단 결과</div>'+
+    weatherBarHTML()+
+    '<h1 class="title">나의 품격 코드</h1>'+
+    '<div class="chip-row">'+
+      '<span class="chip'+toneChip+'">'+(state.gender==='male'?'남성 트랙':'여성 트랙')+'</span>'+
+      '<span class="chip'+toneChip+'">'+bd.label+'</span>'+
+      '<span class="chip gold">'+s.label+'</span>'+
+    '</div>'+
+    '<div class="result-card"><h3>골격·체형 특징</h3><p>'+bd.desc+'</p></div>'+
+    '<div class="result-card">'+
+      '<h3>AI 추천 코디</h3>'+
+      outfitVisual+
+      '<p style="margin-top:4px;">'+(bd.outfit||'')+'</p>'+
+    '</div>'+
+    (extra?'<div class="result-card"><h3>'+(state.gender==='male'?'전문직 이미지 액세서리':'스타일링 팁')+'</h3><p>'+extra+'</p></div>':'')+
+    '<div class="result-card">'+
+      '<h3>퍼스널 컬러 코칭</h3>'+
+      '<div style="margin:10px 0 6px;">'+colorVisual+'</div>'+
+      '<p style="margin-top:10px;">'+s.note+'</p>'+
+    '</div>'+
+    '<button class="btn btn-primary btn-sm tone-gold" style="margin-top:4px" onclick="GraceApp.switchTab(\'chatbot\')">AI 챗봇에게 더 물어보기 →</button>';
+}
+function renderCoaching(){
+  var done=Object.keys(state.coachDone).filter(function(k){return state.coachDone[k];}).length;
+  var accentHex=state.gender==='male'?'#22395C':'#9C5E78';
+  var html='<div class="eyebrow">통합 코칭</div><h1 class="title">오늘의 데일리 챌린지</h1>'+
+    '<p class="desc">외면과 내면을 함께 다듬어요. 가능한 것부터 체크해보세요.</p>';
+  COACH.forEach(function(c){
+    var dk=!!state.coachDone[c.id];
+    html+='<button class="coach-card'+(dk?' done':'')+'" onclick="GraceApp.toggleCoach(\''+c.id+'\')">'+
+      '<div class="coach-box">'+svgIcon('check')+'</div>'+
+      '<div><p class="coach-title">'+c.title+'</p><p class="coach-desc">'+c.desc+'</p><span class="coach-tag">'+c.tag+'</span></div>'+
+    '</button>';
+  });
+  html+='<div style="margin-top:16px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:14px;text-align:center;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:1.8rem;font-weight:700;color:'+accentHex+';">'+done+'<span style="font-size:1rem;color:var(--ink-soft);"> / '+COACH.length+'</span></div>'+
+    '<div style="font-size:.84rem;color:var(--ink-soft);margin-top:4px;">오늘 완료한 챌린지</div></div>';
+  return html;
+}
+function renderChatbot(){
+  var tone=accentTone();
+  var qStyle=tone==='navy'?' navy-style':tone==='rose'?' rose-style':'';
+  var activeTabClass=tone==='navy'?' active-navy':tone==='rose'?' active-rose':' active';
+  var isMale=state.gender==='male';
+  var cats=isMale?CHAT_CATS_MALE:CHAT_CATS_FEMALE;
+  var catIdx=state.quickSet % cats.length;
+  var qrSets=isMale?QUICK_REPLIES_MALE:QUICK_REPLIES_FEMALE;
+  var qrSet=qrSets[catIdx];
+
+  /* 카테고리 탭 */
+  var catHtml='<div class="chat-cats" id="chatCats">'+
+    cats.map(function(c,i){
+      var cls='cat-tab'+(i===catIdx?activeTabClass:'');
+      return '<button class="'+cls+'" onclick="GraceApp.setCat('+i+')">'+c+'</button>';
+    }).join('')+
+  '</div>';
+
+  /* 퀵 리플라이 */
+  var qrHtml=state.isTyping?'':'<div class="quick-row" id="quickRow">'+
+    qrSet.map(function(q){
+      return '<button class="quick-chip'+qStyle+'" onclick="GraceApp.sendQuick(\''+q.replace(/\'/g,'\\\'')+'\')">'+ q+'</button>';
+    }).join('')+'</div>';
+
+  /* 메시지 버블 */
+  var userBubbleClass='msg-row user'+(tone==='rose'?' rose':'');
+  var shareIcon='<svg viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="currentColor" stroke-width="1.8"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="currentColor" stroke-width="1.8"/></svg>';
+
+  var bubblesHtml='';
+  if(state.chatHistory.length===0){
+    bubblesHtml='<div class="chat-empty">'+
+      '<div class="chat-empty-icon">✨</div>'+
+      '<div class="chat-empty-title">안녕하세요, Grace AI입니다</div>'+
+      '<div class="chat-empty-sub">아래 카테고리를 탭하거나 직접 질문해보세요.<br>의상·컬러·자세·발성·내면까지 함께 다듬어 드려요.</div>'+
+    '</div>';
+  } else {
+    state.chatHistory.forEach(function(m,idx){
+      if(m.role==='user'){
+        bubblesHtml+='<div class="'+userBubbleClass+'"><div class="msg-bubble">'+escHtml(m.content)+'</div></div>';
+      } else {
+        var msgId='msg_'+idx;
+        bubblesHtml+='<div class="msg-row" id="'+msgId+'">'+
+          '<div class="msg-avatar">G</div>'+
+          '<div>'+
+            '<div class="msg-bubble">'+m.content+'</div>'+
+            '<button class="msg-share-btn" onclick="GraceApp.shareChatMsg('+idx+')">'+
+              shareIcon+' 공유하기'+
+            '</button>'+
+          '</div>'+
+        '</div>';
+      }
+    });
+  }
+  if(state.isTyping){
+    bubblesHtml+='<div class="msg-row" id="typingRow"><div class="msg-avatar">G</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>';
+  }
+
+  return '<div class="chat-wrap" style="display:flex;flex-direction:column;height:100%;overflow:hidden;">'+
+    catHtml+
+    '<div class="chat-messages" id="chatMessages" style="flex:1 1 auto;overflow-y:auto;">'+bubblesHtml+qrHtml+'</div>'+
+  '</div>';
+}
+
+/* 카테고리 탭 전환 */
+/* 챗봇 메시지 개별 공유 */
+/* 채팅 메시지 전용 공유 카드 */
+/* ── 리포트 점수 계산 ── */
+function calcScores(){
+  var done=Object.keys(state.coachDone).filter(function(k){return state.coachDone[k];}).length;
+  var chatCount=Math.floor(state.chatHistory.length/2);
+  var bodyScore = state.bodyKey ? 25 : 0;
+  var colorScore = state.season ? 25 : 0;
+  var coachScore = Math.round((done/COACH.length)*30);
+  var chatScore  = Math.min(chatCount*5, 20);
+  return {
+    total: bodyScore+colorScore+coachScore+chatScore,
+    body: bodyScore, color: colorScore,
+    coach: coachScore, chat: chatScore,
+    done: done, chatCount: chatCount
+  };
+}
+
+/* ── 원형 스코어 SVG ── */
+function scoreSVG(score, color){
+  var r=36, c=44, circ=2*Math.PI*r;
+  var offset=circ*(1-score/100);
+  return '<svg width="88" height="88" viewBox="0 0 88 88">'+
+    '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="#E9E2D6" stroke-width="7"/>'+
+    '<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="7"'+
+      ' stroke-linecap="round" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+offset.toFixed(1)+'"'+
+      ' transform="rotate(-90 '+c+' '+c+')" style="transition:stroke-dashoffset 1s ease"/>'+
+    '<text x="'+c+'" y="'+(c+5)+'" text-anchor="middle" font-size="16" font-weight="900" fill="#2B2A33" font-family="sans-serif">'+score+'</text>'+
+  '</svg>';
+}
+
+/* ── 퍼스널 컬러 팔레트 헬퍼 (모듈 스코프) ── */
+/* ── 캔버스 공유 카드 생성 ── */
+/* ── 공유 함수 ── */
+function renderReport(){
+  var bd=bodyData(); var s=seasonData();
+  var isMale=state.gender==='male';
+  var sc=calcScores();
+  var accentColor=isMale?'var(--navy)':'var(--rose)';
+  var accentHex=isMale?'#22395C':'#9C5E78';
+
+  // 체형별 상세 스타일 가이드
+  var STYLE_GUIDE_MALE={
+    straight:{
+      must:['어깨 솔기가 정확히 맞는 수트','V존을 강조하는 넥타이','날렵한 옥스퍼드 슈즈'],
+      avoid:['박시한 핏의 후드류','와이드 팬츠 (골반 비율 무너짐)','화려한 프린트 셔츠'],
+      meravian:'55% 단정한 수트 라인 · 38% 또렷한 발음 · 7% 핵심 단어 선택'
+    },
+    curve:{
+      must:['부드러운 소재의 저지 수트','라운드 칼라 셔츠','낮은 굽 로퍼'],
+      avoid:['뻣뻣한 캔버스 소재','과도하게 각진 어깨 패드','차가운 그레이 계열'],
+      meravian:'55% 부드러운 소재감 · 38% 온화한 발성 · 7% 배려 있는 언어'
+    },
+    volume:{
+      must:['세로 스트라이프 셔츠','다크 계열 단색 슬랙스','두꺼운 테 안경 (얼굴 볼륨 균형)'],
+      avoid:['가로 패턴 (수평선 강조)','밝은 컬러 재킷','짧은 재킷 길이'],
+      meravian:'55% 세로 실루엣 강조 · 38% 낮고 안정감 있는 발성 · 7% 간결한 언어'
+    }
+  };
+  var STYLE_GUIDE_FEMALE={
+    S:{
+      must:['허리 절개가 있는 슬림 원피스','스트레이트 핏 코트','스트랩 샌들·힐'],
+      avoid:['과한 개더나 러플','볼륨 소매 (상체가 무거워 보임)','어깨 패드'],
+      meravian:'55% 직선 실루엣 유지 · 38% 명확하고 또렷한 발성 · 7% 논리적인 언어'
+    },
+    W:{
+      must:['랩 원피스·벨트 코디','플레어 스커트 (하체 균형)','포인트 네크라인 블라우스'],
+      avoid:['박시한 오버핏 상의','허리를 가리는 긴 카디건','단색 무채색 세트업'],
+      meravian:'55% 허리 라인 강조 · 38% 부드럽고 곡선적인 발성 · 7% 감성적인 언어'
+    },
+    N:{
+      must:['소재감이 좋은 린넨·실크 블라우스','와이드 팬츠·버뮤다 팬츠','오버사이즈 니트'],
+      avoid:['너무 딱 붙는 타이트 소재','과도한 장식·레이스','저렴해 보이는 소재'],
+      meravian:'55% 소재의 고급감 · 38% 자연스럽고 진솔한 발성 · 7% 담백한 언어'
+    },
+    B:{
+      must:['A라인 스커트·원피스','엠파이어 웨이스트 원피스','베스트+와이드 팬츠 레이어링'],
+      avoid:['스키니 팬츠','수평 스트라이프','딱 붙는 니트'],
+      meravian:'55% 흐르는 실루엣 · 38% 따뜻하고 포용적인 발성 · 7% 공감하는 언어'
+    }
+  };
+
+  var guide=isMale?STYLE_GUIDE_MALE[state.bodyKey]:STYLE_GUIDE_FEMALE[state.bodyKey];
+  var coachItems=['미소 훈련','발성 훈련','단단한 자세','마음가짐'];
+  var p=COLOR_PALETTE[state.season]||{colors:[]};
+
+  // 퍼스널 컬러 기반 그라디언트 — 시즌별 2가지 키컬러 활용
+  var seasonGradients={
+    spring:{from:'#E8896A', to:'#C96E45', text:'#fff', ring:'rgba(255,255,255,0.9)'},
+    summer:{from:'#8097BC', to:'#5C6F94', text:'#fff', ring:'rgba(255,255,255,0.9)'},
+    autumn:{from:'#A0622A', to:'#6E3F14', text:'#fff', ring:'rgba(255,255,255,0.9)'},
+    winter:{from:'#2F4566', to:'#1A2840', text:'#fff', ring:'rgba(255,255,255,0.9)'}
+  };
+  var fallback={from:isMale?'#22395C':'#9C5E78', to:isMale?'#142238':'#6E3A52', text:'#fff', ring:'rgba(255,255,255,0.9)'};
+  var palette=seasonGradients[state.season]||fallback;
+  var cardGrad='linear-gradient(145deg,'+palette.from+' 0%,'+palette.to+' 100%)';
+  // 진행 바와 강조색은 퍼스널 컬러 첫 번째 스와치
+  var p=COLOR_PALETTE[state.season];
+  var barColor=p?p.colors[0].hex:palette.from;
+  var barBg=p?p.colors[3].hex+'55':'rgba(255,255,255,0.2)';
+
+  // 스타일리쉬한 등급 문구 (점수 범위 → 감성적 타이틀 + 서브 메시지)
+  var gradeData;
+  if(sc.total>=80){
+    gradeData={
+      badge:'✦ Signature Grace',
+      title: isMale?'당신만의 신뢰 시그니처가 완성됐습니다':'당신만의 우아한 시그니처가 완성됐습니다',
+      sub:   '오늘의 루틴이 내일의 브랜드가 됩니다. 이 품격을 매일 입어보세요.'
+    };
+  } else if(sc.total>=60){
+    gradeData={
+      badge:'✦ Rising Grace',
+      title: isMale?'신뢰의 결이 선명하게 살아나고 있어요':'우아함이 조금씩 피어나고 있어요',
+      sub:   '자기다움을 찾는 여정, 이미 반 이상 왔습니다. 계속 걸어가세요.'
+    };
+  } else if(sc.total>=40){
+    gradeData={
+      badge:'✦ Awakening Grace',
+      title: isMale?'좋은 에너지로 출발했습니다':'아름다운 변화가 시작됐어요',
+      sub:   '작은 실천 하나가 이미지를 바꿉니다. 오늘을 기억해두세요.'
+    };
+  } else {
+    gradeData={
+      badge:'✦ First Grace',
+      title: isMale?'품격 여정의 첫 페이지를 열었습니다':'나다운 아름다움을 찾는 첫걸음이에요',
+      sub:   '시작했다는 것 자체가 이미 특별합니다. 천천히, 하나씩 시작해봐요.'
+    };
+  }
+
+  // 종합 메시지 (공유용 호환)
+  var grade=gradeData.badge;
+
+  // 점수 바 - 퍼스널 컬러 적용
+  var scoreItems=[
+    {label:'체형 진단',score:sc.body,max:25},
+    {label:'컬러 진단',score:sc.color,max:25},
+    {label:'코칭 달성',score:sc.coach,max:30},
+    {label:'AI 상담',score:sc.chat,max:20}
+  ];
+  var scoreBars=scoreItems.map(function(item){
+    var pct=Math.round((item.score/item.max)*100);
+    return '<div style="margin-bottom:10px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+        '<span style="font-size:.84rem;color:var(--ink-soft);">'+item.label+'</span>'+
+        '<span style="font-size:.84rem;font-weight:700;">'+item.score+' / '+item.max+'점</span>'+
+      '</div>'+
+      '<div style="height:8px;background:#E9E2D6;border-radius:999px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:999px;transition:width 1s ease;"></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  // 코칭 달성 - 퍼스널 컬러 적용
+  var coachItems=['미소 훈련','발성 훈련','단단한 자세','마음가짐'];
+  var coachBars=coachItems.map(function(name,i){
+    var id=COACH[i]?COACH[i].id:null;
+    var done2=id&&!!state.coachDone[id];
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'+
+      '<div style="width:6px;height:6px;border-radius:50%;background:'+(done2?barColor:'#D9D2C4')+';flex-shrink:0;"></div>'+
+      '<div style="flex:1;font-size:.86rem;color:'+(done2?'var(--ink)':'var(--ink-soft)')+';font-weight:'+(done2?'700':'400')+';line-height:1.4;">'+name+'</div>'+
+      (done2?'<span style="font-size:.72rem;font-weight:700;color:'+palette.from+';background:'+palette.from+'22;border-radius:6px;padding:2px 7px;">완료</span>':'<span style="font-size:.72rem;color:#C4B9AE;">미완료</span>')+
+    '</div>';
+  }).join('');
+
+  // 실천 제안
+  var action1=guide&&guide.must?guide.must[0]:'당신에게 어울리는 스타일로 시작해보세요.';
+  var action2=guide&&guide.avoid?guide.avoid[0]+'은 당신의 이미지와 맞지 않아요.':'어울리지 않는 스타일은 과감히 내려놓으세요.';
+
+  return ''+
+  /* ── 헤더 ── */
+  '<div style="text-align:center;padding:6px 0 18px;">'+
+    '<div style="font-size:.78rem;letter-spacing:.1em;font-weight:700;color:var(--gold-deep);margin-bottom:6px;">GRACE AI CONSULTING REPORT</div>'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:1.5rem;font-weight:700;">품격 컨설팅 리포트</div>'+
+    '<div style="font-size:.82rem;color:var(--ink-soft);margin-top:5px;">'+ctx.dateStr+'</div>'+
+    (ctx.weatherTemp?'<div style="font-size:.8rem;color:var(--gold-deep);font-weight:700;margin-top:4px;">'+ctx.weatherIcon+' '+ctx.weatherDesc+' '+ctx.weatherTemp+' · '+ctx.calSeason+' · '+ctx.timePeriod+'</div>':
+     '<div style="font-size:.8rem;color:var(--gold-deep);font-weight:700;margin-top:4px;">'+ctx.calSeason+' · '+ctx.timePeriod+'</div>')+
+  '</div>'+
+
+  /* ── 종합 점수 ── */
+  '<div style="background:'+cardGrad+';border-radius:22px;padding:22px 20px 20px;margin-bottom:14px;">'+
+    '<div style="display:flex;align-items:center;gap:18px;margin-bottom:16px;">'+
+      '<div style="flex:0 0 auto;">'+scoreSVG(sc.total, palette.ring)+'</div>'+
+      '<div style="flex:1;color:'+palette.text+';">'+
+        '<div style="font-size:.68rem;font-weight:700;letter-spacing:.12em;opacity:.75;margin-bottom:6px;">GRACE AI · 종합 품격 점수</div>'+
+        '<div style="font-family:\'Noto Serif KR\',serif;font-size:.88rem;font-weight:700;letter-spacing:.04em;opacity:.9;margin-bottom:4px;">'+gradeData.badge+'</div>'+
+        '<div style="font-family:\'Noto Serif KR\',serif;font-size:1rem;font-weight:700;line-height:1.45;">'+gradeData.title+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;">'+
+      '<div style="font-size:.84rem;color:'+palette.text+';opacity:.9;line-height:1.6;">'+gradeData.sub+'</div>'+
+    '</div>'+
+  '</div>'+
+
+  /* ── 진단 요약 ── */
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:12px;">📋 진단 요약</div>'+
+    '<div class="report-row"><span>이미지 트랙</span><span style="color:'+palette.from+';">'+(isMale?'남성 · 신뢰와 성공':'여성 · 우아함과 자아 일치')+'</span></div>'+
+    '<div class="report-row"><span>'+(isMale?'골격 유형':'체형 코드')+'</span><span>'+bd.label+'</span></div>'+
+    '<div class="report-row"><span>퍼스널 컬러</span><span>'+s.label+'</span></div>'+
+    '<div class="report-row"><span>코칭 완료</span><span>'+sc.done+' / '+COACH.length+'</span></div>'+
+    '<div class="report-row"><span>AI 챗봇 상담</span><span>'+sc.chatCount+'회</span></div>'+
+  '</div>'+
+
+  /* ── 점수 세부 ── */
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:12px;">📊 항목별 점수</div>'+
+    scoreBars+
+  '</div>'+
+
+  /* ── 스타일 가이드 ── */
+  (guide?
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:12px;">👗 나의 스타일 가이드</div>'+
+    '<div style="font-size:.82rem;font-weight:700;color:'+palette.from+';margin-bottom:8px;">✅ 지금 당장 입어야 할 아이템</div>'+
+    guide.must.map(function(m,i){return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;"><div style="flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:'+barColor+';color:#fff;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</div><div style="font-size:.86rem;line-height:1.5;">'+m+'</div></div>';}).join('')+
+    '<div style="height:1px;background:var(--line);margin:12px 0;"></div>'+
+    '<div style="font-size:.82rem;font-weight:700;color:var(--danger);margin-bottom:8px;">❌ 피해야 할 스타일</div>'+
+    guide.avoid.map(function(a){return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;"><div style="flex:0 0 auto;font-size:.86rem;color:var(--danger);">✕</div><div style="font-size:.86rem;line-height:1.5;color:var(--ink-soft);">'+a+'</div></div>';}).join('')+
+  '</div>':'') +
+
+  /* ── 메러비안 법칙 ── */
+  (guide&&guide.meravian?
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:10px;">💬 메러비안 법칙 적용</div>'+
+    '<div style="font-size:.82rem;color:var(--ink-soft);line-height:1.6;margin-bottom:10px;">첫인상의 <strong>93%</strong>는 시각과 청각으로 결정됩니다.</div>'+
+    '<div style="background:var(--gold-bg);border-radius:12px;padding:12px 14px;font-size:.86rem;line-height:1.7;color:var(--gold-deep);font-weight:500;">'+guide.meravian+'</div>'+
+  '</div>':'') +
+
+  /* ── 퍼스널 컬러 요약 ── */
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:10px;">🎨 퍼스널 컬러 팔레트</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px;">'+(p?p.colors.map(function(c){return '<div style="text-align:center;flex:1;"><div style="height:32px;border-radius:8px;background:'+c.hex+';margin-bottom:4px;box-shadow:0 1px 4px rgba(0,0,0,.1);"></div><div style="font-size:.68rem;color:var(--ink-soft);font-weight:700;">'+c.name+'</div></div>';}).join(''):'')+'</div>'+
+    '<div style="font-size:.86rem;color:var(--ink-soft);line-height:1.6;">'+s.note+'</div>'+
+  '</div>'+
+
+  /* ── 코칭 달성 ── */
+  '<div class="report-card" style="margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:12px;">🏆 코칭 달성 현황</div>'+
+    coachBars+
+  '</div>'+
+
+  /* ── 오늘의 실천 제안 ── */
+  '<div style="background:var(--gold-bg);border-radius:20px;padding:20px;margin-bottom:14px;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:.98rem;font-weight:700;margin-bottom:12px;color:var(--gold-deep);">💡 내일을 위한 실천 제안</div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px;">'+
+      '<div style="display:flex;gap:10px;align-items:flex-start;"><div style="flex:0 0 22px;font-size:.86rem;">1️⃣</div><div style="font-size:.88rem;line-height:1.6;"><strong>'+action1+'</strong> — 지금 당장 옷장에서 찾아보세요.</div></div>'+
+      '<div style="display:flex;gap:10px;align-items:flex-start;"><div style="flex:0 0 22px;font-size:.86rem;">2️⃣</div><div style="font-size:.88rem;line-height:1.6;"><strong>거울 앞 미소 연습</strong> — 아·에·이·오·우 발음과 함께 1분이면 충분해요.</div></div>'+
+      '<div style="display:flex;gap:10px;align-items:flex-start;"><div style="flex:0 0 22px;font-size:.86rem;">3️⃣</div><div style="font-size:.88rem;line-height:1.6;">'+action2+'</div></div>'+
+    '</div>'+
+  '</div>'+
+
+  /* ── 공유 카드 ── */
+  '<div style="border:2px solid '+palette.from+';border-radius:20px;padding:20px;margin-bottom:14px;text-align:center;">'+
+    '<div style="font-family:\'Noto Serif KR\',serif;font-size:1.1rem;font-weight:700;margin-bottom:4px;">'+
+      (isMale?'"신뢰와 성공, 단단한 이미지를 찾았습니다."':'"있는 그대로의 우아함을 한 걸음 찾아갔습니다."')+
+    '</div>'+
+    '<div style="font-size:.78rem;color:var(--ink-soft);margin-bottom:16px;">— Grace AI 컨설팅 리포트</div>'+
+    '<div style="display:flex;gap:8px;">'+
+      '<button onclick="GraceApp.shareReport()" class="btn btn-primary btn-sm" style="flex:1;background:'+palette.from+';gap:6px;min-height:50px;">'+
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+        '결과 공유하기'+
+      '</button>'+
+      '<button onclick="GraceApp.copyReport()" class="btn btn-sm" style="flex:0 0 50px;min-height:50px;background:#fff;border:1.5px solid var(--line);border-radius:14px;cursor:pointer;" title="복사">'+
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="#736C72" stroke-width="1.8"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#736C72" stroke-width="1.8" stroke-linecap="round"/></svg>'+
+      '</button>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-top:8px;">'+
+      '<button onclick="GraceApp.shareKakao()" class="btn btn-sm" style="flex:1;min-height:46px;background:#FEE500;color:#2B2A33;border:none;border-radius:14px;cursor:pointer;font-size:.88rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;">'+
+        '<svg width="18" height="17" viewBox="0 0 18 17" fill="none"><path d="M9 0C4.03 0 0 3.16 0 7.06c0 2.5 1.66 4.7 4.17 5.97L3.2 16.38c-.08.32.29.57.57.37L8 13.97c.33.03.66.05 1 .05 4.97 0 9-3.16 9-7.06C18 3.16 13.97 0 9 0z" fill="#2B2A33"/>'+
+        '</svg>카카오톡 공유'+
+      '</button>'+
+      '<button onclick="GraceApp.shareInsta()" class="btn btn-sm" style="flex:1;min-height:46px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;border:none;border-radius:14px;cursor:pointer;font-size:.88rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;">'+
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>'+
+        '인스타 공유'+
+      '</button>'+
+    '</div>'+
+  '</div>'+
+
+  /* ── 하단 CTA ── */
+  '<div style="display:flex;gap:8px;margin-bottom:8px;">'+
+    '<button class="btn btn-primary btn-sm tone-gold" style="flex:1" onclick="GraceApp.switchTab(\'chatbot\')">AI 챗봇과 더 이야기하기</button>'+
+  '</div>'+
+  '<button onclick="GraceApp.restart()" style="'+
+    'width:100%;min-height:52px;border:2px solid var(--line);'+
+    'background:#fff;border-radius:14px;'+
+    'font-family:\'Noto Sans KR\',sans-serif;font-size:.96rem;font-weight:700;'+
+    'color:var(--ink-soft);cursor:pointer;'+
+    'display:flex;align-items:center;justify-content:center;gap:6px;'+
+    'touch-action:manipulation;-webkit-tap-highlight-color:transparent;'+
+    'margin-bottom:4px;'+
+  '">'+
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+    '처음으로 돌아가기'+
+  '</button>';
+}
+
+
+/* ═══════════════════ CANVAS & SHARE HELPERS (ordered) ═══════════════════ */
+function roundRect(ctx2,x,y,w,h,r){
+  ctx2.beginPath();
+  ctx2.moveTo(x+r,y);
+  ctx2.lineTo(x+w-r,y);
+  ctx2.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx2.lineTo(x+w,y+h-r);
+  ctx2.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx2.lineTo(x+r,y+h);
+  ctx2.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx2.lineTo(x,y+r);
+  ctx2.quadraticCurveTo(x,y,x+r,y);
+  ctx2.closePath();
+}
+
+
+
+function wrapText(ctx2,text,x,y,maxW,lineH){
+  if(!text) return;
+  var words=text.split(' '), line='';
+  for(var i=0;i<words.length;i++){
+    var test=line+words[i]+' ';
+    if(ctx2.measureText(test).width>maxW&&i>0){
+      ctx2.fillText(line,x,y); line=words[i]+' '; y+=lineH;
+    } else { line=test; }
+  }
+  ctx2.fillText(line,x,y);
+}
+
+
+
+function getSeasonPalette(){
+  var map={
+    spring:{from:'#E8896A',to:'#C96E45',text:'#fff'},
+    summer:{from:'#8097BC',to:'#5C6F94',text:'#fff'},
+    autumn:{from:'#A0622A',to:'#6E3F14',text:'#fff'},
+    winter:{from:'#2F4566',to:'#1A2840',text:'#fff'}
+  };
+  return map[state.season]||{from:'#22395C',to:'#0E1E33',text:'#fff'};
+}
+
+
+
+function getGradeLabel(){
+  var sc=calcScores();
+  if(sc.total>=80) return 'Signature Grace';
+  if(sc.total>=60) return 'Rising Grace';
+  if(sc.total>=40) return 'Awakening Grace';
+  return 'First Grace';
+}
+
+
+
+function generateChatCard(question, answer){
+  return new Promise(function(resolve){
+    var W=900, H=700;
+    var cv=document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    var g=cv.getContext('2d');
+    var pal=getSeasonPalette();
+    var isMale=state.gender==='male';
+
+    /* 배경 */
+    var bg=g.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,pal.from); bg.addColorStop(1,pal.to);
+    g.fillStyle=bg; roundRect(g,0,0,W,H,0); g.fill();
+
+    /* 반투명 장식 */
+    g.globalAlpha=0.07; g.fillStyle='#fff';
+    g.beginPath(); g.arc(W-80,80,180,0,Math.PI*2); g.fill();
+    g.globalAlpha=1;
+
+    /* 헤더 */
+    g.fillStyle='rgba(255,255,255,0.18)';
+    roundRect(g,0,0,W,80,0); g.fill();
+    g.fillStyle='#fff'; g.font='bold 24px sans-serif';
+    g.fillText('GRACE AI  ·  코칭 상담 내용', 36, 50);
+    g.fillStyle='rgba(255,255,255,0.65)'; g.font='400 16px sans-serif';
+    g.fillText((isMale?'남성 · 신뢰와 성공':'여성 · 우아함과 자아 일치')+' · '+ctx.dateStr, 36, 72);
+
+    /* Q 버블 (우측) */
+    if(question){
+      g.fillStyle='rgba(255,255,255,0.22)';
+      roundRect(g,W/2,110,W/2-40,72,14); g.fill();
+      g.fillStyle='#fff'; g.font='bold 15px sans-serif';
+      g.fillText('Q', W/2+16, 138);
+      g.font='400 15px sans-serif';
+      wrapText(g, question, W/2+38, 138, W/2-90, 22);
+    }
+
+    /* A 카드 (흰색) */
+    var ay=question?204:110;
+    g.fillStyle='rgba(255,255,255,0.96)';
+    roundRect(g,36,ay,W-72,H-ay-60,18); g.fill();
+
+    /* G 아바타 */
+    var grad=g.createLinearGradient(60,ay+24,96,ay+60);
+    grad.addColorStop(0,pal.from); grad.addColorStop(1,pal.to);
+    g.fillStyle=grad;
+    g.beginPath(); g.arc(78,ay+42,28,0,Math.PI*2); g.fill();
+    g.fillStyle='#fff'; g.font='bold 20px serif';
+    g.textAlign='center'; g.fillText('G',78,ay+49); g.textAlign='left';
+
+    g.fillStyle='#2B2A33'; g.font='bold 16px sans-serif';
+    g.fillText('Grace AI 코칭', 116, ay+34);
+    g.fillStyle='#736C72'; g.font='400 13px sans-serif';
+    g.fillText(ctx.timeStr+' · '+ctx.calSeason, 116, ay+54);
+
+    /* 구분선 */
+    g.strokeStyle='#E1D6C6'; g.lineWidth=1;
+    g.beginPath(); g.moveTo(56,ay+76); g.lineTo(W-56,ay+76); g.stroke();
+
+    /* 답변 텍스트 */
+    g.fillStyle='#2B2A33'; g.font='400 17px sans-serif';
+    var maxLines=Math.floor((H-ay-150)/26);
+    var shortAnswer=answer.length>280?answer.substring(0,280)+'…':answer;
+    wrapText(g, shortAnswer, 56, ay+104, W-112, 26);
+
+    /* 하단 해시태그 */
+    g.fillStyle='rgba(255,255,255,0.85)';
+    roundRect(g,0,H-56,W,56,0); g.fill();
+    g.fillStyle=pal.from; g.font='bold 15px sans-serif';
+    g.textAlign='center';
+    g.fillText('#GraceAI  #이미지코칭  #퍼스널스타일  #4050품격', W/2, H-24);
+    g.textAlign='left';
+
+    resolve({dataUrl:cv.toDataURL('image/png'), name:'grace-ai-chat.png'});
+  });
+}
+
+
+
+function generateShareCard(){
+  return new Promise(function(resolve){
+    var W=900, H=1100;
+    var cv=document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    var g=cv.getContext('2d');
+    var bd=bodyData(); var s=seasonData(); var sc=calcScores();
+    var isMale=state.gender==='male';
+    var pal=getSeasonPalette();
+    var p=COLOR_PALETTE[state.season];
+
+    // 배경 그라디언트
+    var bg=g.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0, pal.from);
+    bg.addColorStop(1, pal.to);
+    g.fillStyle=bg;
+    roundRect(g,0,0,W,H,0); g.fill();
+
+    // 상단 패턴 (반투명 원)
+    g.globalAlpha=0.07;
+    g.fillStyle='#fff';
+    g.beginPath(); g.arc(W-60,60,200,0,Math.PI*2); g.fill();
+    g.beginPath(); g.arc(60,H-80,160,0,Math.PI*2); g.fill();
+    g.globalAlpha=1;
+
+    // 흰색 카드
+    g.fillStyle='rgba(255,255,255,0.15)';
+    roundRect(g,40,40,W-80,H-80,32); g.fill();
+    g.fillStyle='rgba(255,255,255,0.96)';
+    roundRect(g,60,130,W-120,H-200,24); g.fill();
+
+    // 헤더 영역
+    g.fillStyle='rgba(255,255,255,0.18)';
+    roundRect(g,40,40,W-80,76,32); g.fill();
+
+    // 브랜드
+    g.fillStyle='#fff';
+    g.font='bold 26px sans-serif';
+    g.letterSpacing='4px';
+    g.fillText('GRACE AI', 76, 90);
+    g.font='400 20px sans-serif';
+    g.fillStyle='rgba(255,255,255,0.75)';
+    g.fillText('품격 컨설팅 리포트  ·  '+ctx.dateStr, 76, 115);
+
+    // 점수 원형
+    var cx=W-140, cy=210, r=70;
+    g.strokeStyle='rgba(255,255,255,0.3)';
+    g.lineWidth=10;
+    g.beginPath(); g.arc(cx,cy,r,-Math.PI/2,Math.PI*2-Math.PI/2); g.stroke();
+    g.strokeStyle='#fff';
+    g.lineWidth=10;
+    var ang=(sc.total/100)*Math.PI*2 - Math.PI/2;
+    g.beginPath(); g.arc(cx,cy,r,-Math.PI/2,ang); g.stroke();
+    g.fillStyle='#fff';
+    g.font='bold 36px sans-serif';
+    g.textAlign='center';
+    g.fillText(sc.total, cx, cy+6);
+    g.font='500 16px sans-serif';
+    g.fillStyle='rgba(255,255,255,0.75)';
+    g.fillText('/ 100', cx, cy+28);
+    g.textAlign='left';
+
+    // 등급 배지 (카드 내부)
+    var bx=80, by=155;
+    g.fillStyle=pal.from+'22';
+    roundRect(g,bx,by,240,38,12); g.fill();
+    g.fillStyle=pal.from;
+    g.font='bold 18px sans-serif';
+    g.fillText('✦ '+getGradeLabel(), bx+14, by+25);
+
+    // 타이틀
+    g.fillStyle='#2B2A33';
+    g.font='bold 30px serif';
+    g.fillText(isMale?'신뢰와 성공의 이미지':'우아함과 자아 일치의 품격', 80, 222);
+    g.fillStyle='#736C72';
+    g.font='400 20px sans-serif';
+    g.fillText(isMale?'당신만의 전문가 브랜드가 완성됩니다':'당신만의 아름다움을 찾아가는 여정', 80, 255);
+
+    // 구분선
+    g.strokeStyle='#E1D6C6'; g.lineWidth=1.5;
+    g.beginPath(); g.moveTo(80,278); g.lineTo(W-80,278); g.stroke();
+
+    // 진단 정보 그리드
+    var items=[
+      {icon:'👤', label:isMale?'골격':'체형', value:bd.label||'-'},
+      {icon:'🎨', label:'퍼스널 컬러', value:s.label||'-'},
+      {icon:'📊', label:'종합 점수', value:sc.total+'점'},
+      {icon:'🏆', label:'코칭 달성', value:sc.done+' / 4'}
+    ];
+    var gy=295;
+    items.forEach(function(item,i){
+      var col=i%2, row=Math.floor(i/2);
+      var ix=80+col*((W-160)/2), iy=gy+row*90;
+      g.fillStyle='#F8F5F0';
+      roundRect(g,ix,iy,(W-180)/2,72,12); g.fill();
+      g.font='22px sans-serif'; g.fillText(item.icon, ix+14, iy+30);
+      g.fillStyle='#736C72'; g.font='400 15px sans-serif'; g.fillText(item.label, ix+44, iy+25);
+      g.fillStyle='#2B2A33'; g.font='bold 19px sans-serif'; g.fillText(item.value, ix+44, iy+52);
+    });
+
+    // 퍼스널 컬러 스와치
+    var sy=gy+200;
+    g.fillStyle='#2B2A33'; g.font='bold 20px sans-serif';
+    g.fillText('퍼스널 컬러 팔레트', 80, sy);
+    if(p){
+      p.colors.forEach(function(c,i){
+        var sx2=80+i*((W-160)/4);
+        g.fillStyle=c.hex;
+        roundRect(g,sx2,sy+14,(W-180)/4-8,52,10); g.fill();
+        g.fillStyle='rgba(0,0,0,0.5)';
+        g.font='400 13px sans-serif';
+        var lx=sx2+((W-180)/4-8)/2;
+        g.textAlign='center'; g.fillText(c.name,lx,sy+82); g.textAlign='left';
+      });
+    }
+
+    // AI 추천 코디
+    var ay=sy+110;
+    g.fillStyle='#2B2A33'; g.font='bold 20px sans-serif';
+    g.fillText('AI 추천 코디', 80, ay);
+    g.fillStyle='#736C72'; g.font='400 17px sans-serif';
+    wrapText(g, bd.outfit||'', 80, ay+28, W-160, 24);
+
+    // 날씨/날짜 하단
+    g.fillStyle='rgba(255,255,255,0.85)';
+    roundRect(g,40,H-110,W-80,70,20); g.fill();
+    var weatherLine=(ctx.weatherTemp?ctx.weatherIcon+' '+ctx.weatherDesc+' '+ctx.weatherTemp+' · ':'')+ctx.calSeason+' · '+ctx.timePeriod+' · '+ctx.timeStr;
+    g.fillStyle=pal.from; g.font='bold 18px sans-serif';
+    g.textAlign='center';
+    g.fillText(weatherLine, W/2, H-82);
+    g.fillStyle='rgba(0,0,0,0.35)'; g.font='400 15px sans-serif';
+    g.fillText('#GraceAI  #이미지브랜딩  #퍼스널컬러  #4050품격', W/2, H-55);
+    g.textAlign='left';
+
+    resolve({dataUrl:cv.toDataURL('image/png'), name:'grace-ai-report.png'});
+  });
+}
+
+
+
+function setCat(idx){
+  state.quickSet=idx;
+  renderMain(); scrollChat();
+}
+
+
+
+/* ════════════════════════════════════════════════
+   공유 바텀시트 시스템 — Web Share API 불필요, 모든 환경 작동
+   ════════════════════════════════════════════════ */
+
+var _shareOverlay=null;
+
+function closeShareSheet(){
+  if(_shareOverlay){
+    var el=_shareOverlay;
+    _shareOverlay=null;
+    // 즉시 pointer-events 차단 해제 → 아래 버튼 즉시 클릭 가능
+    el.style.pointerEvents='none';
+    el.style.opacity='0';
+    el.style.transition='opacity .2s';
+    setTimeout(function(){
+      if(el.parentNode) el.parentNode.removeChild(el);
+    },220);
+  }
+}
+
+function openApp(scheme,fallbackUrl){
+  var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isMobile){
+    var t=Date.now();
+    setTimeout(function(){ if(Date.now()-t<1800) window.open(fallbackUrl,'_blank'); },1200);
+    try{ window.location.href=scheme; }catch(e){ window.open(fallbackUrl,'_blank'); }
+  } else { window.open(fallbackUrl,'_blank'); }
+}
+
+function _legacyCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); showToast('텍스트를 복사했어요! 📋\n앱에 붙여넣기 하세요.'); }
+  catch(e){ showToast('직접 텍스트를 선택해서 복사해주세요.'); }
+  document.body.removeChild(ta);
+}
+
+function showShareSheet(card, captionText, type){
+  closeShareSheet();
+  // card = {dataUrl, name} from generateShareCard/generateChatCard
+  var imgUrl = card.dataUrl;
+  var fileName = card.name || (type==='chat'?'grace-ai-chat.png':'grace-ai-report.png');
+  var pal=getSeasonPalette();
+
+  var overlay=document.createElement('div');
+  overlay.className='share-overlay';
+  overlay.onclick=function(e){ if(e.target===overlay) closeShareSheet(); };
+
+  var sheet=document.createElement('div');
+  sheet.className='share-sheet';
+  sheet.innerHTML=
+    '<div class="share-sheet-handle"></div>'+
+    '<img class="share-preview" src="'+imgUrl+'" alt="공유 카드"/>'+
+    '<div class="share-title">공유하기</div>'+
+    '<div class="share-desc">이미지 저장 후 원하는 앱으로 공유하세요</div>'+
+    '<div class="share-grid">'+
+      '<button class="share-btn-item" id="sb_download">'+
+        '<div class="sb-icon" style="background:#EEF2F7;">💾</div>'+
+        '<div class="sb-label">이미지 저장</div><div class="sb-sub">갤러리에 저장</div>'+
+      '</button>'+
+      '<button class="share-btn-item" id="sb_copy">'+
+        '<div class="sb-icon" style="background:#EEF2F7;">📋</div>'+
+        '<div class="sb-label">텍스트 복사</div><div class="sb-sub">캡션 복사</div>'+
+      '</button>'+
+      '<button class="share-btn-item" id="sb_kakao">'+
+        '<div class="sb-icon" style="background:#FEE500;"><svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M12 0C5.37 0 0 4.2 0 9.38c0 3.33 2.2 6.25 5.53 7.95l-1.29 5.23c-.1.43.39.76.76.5L11 19.1c.33.04.66.06 1 .06 6.63 0 12-4.2 12-9.38C24 4.2 18.63 0 12 0z" fill="#191919"/></svg></div>'+
+        '<div class="sb-label">카카오톡</div><div class="sb-sub">앱 열기</div>'+
+      '</button>'+
+      '<button class="share-btn-item" id="sb_insta">'+
+        '<div class="sb-icon" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="2"/><circle cx="12" cy="12" r="5" stroke="white" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="white"/></svg></div>'+
+        '<div class="sb-label">인스타그램</div><div class="sb-sub">스토리·피드</div>'+
+      '</button>'+
+    '</div>'+
+    '<button class="share-full-btn" id="sb_native" style="background:'+pal.from+';color:#fff;">'+
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      ' 더 많은 앱으로 공유하기'+
+    '</button>'+
+    '<button class="share-close-btn" id="sb_close">닫기</button>';
+
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+  _shareOverlay=overlay;
+
+  function dlImg(){
+    var a=document.createElement('a');
+    a.href=imgUrl; a.download=fileName;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){document.body.removeChild(a);},600);
+  }
+  function cpText(){
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(captionText)
+        .then(function(){showToast('텍스트 복사 완료! 📋\n앱에 붙여넣기 하세요.');})
+        .catch(function(){_legacyCopy(captionText);});
+    } else { _legacyCopy(captionText); }
+  }
+
+  document.getElementById('sb_download').onclick=function(){
+    dlImg();
+    showToast('이미지를 저장했어요! 📸\n갤러리에서 확인하세요.');
+  };
+  document.getElementById('sb_copy').onclick=function(){
+    cpText();
+    showToast('텍스트를 복사했어요! 📋\n앱에 붙여넣기 하세요.');
+  };
+  document.getElementById('sb_kakao').onclick=function(){
+    dlImg(); cpText();
+    setTimeout(function(){
+      openApp('kakaotalk://launch','https://www.kakaocorp.com/page/service/service/KakaoTalk');
+    },400);
+    closeShareSheet();
+    showToast('이미지 저장 + 텍스트 복사 완료! 💛\n카카오톡 앱에서\n이미지 첨부 후 붙여넣기 하세요.');
+  };
+  document.getElementById('sb_insta').onclick=function(){
+    dlImg();
+    setTimeout(function(){
+      openApp('instagram://library','https://www.instagram.com');
+    },400);
+    closeShareSheet();
+    showToast('이미지를 저장했어요! 📸\n인스타그램 앱에서\n스토리·피드로 올려보세요.');
+  };
+  document.getElementById('sb_native').onclick=function(){
+    // 시트 닫기 + 텍스트 복사 + 안내
+    cpText();
+    closeShareSheet();
+    showToast('텍스트를 복사했어요! 📋\n원하는 앱을 열고 붙여넣기 해보세요.');
+  };
+  document.getElementById('sb_close').onclick=function(){
+    closeShareSheet();
+  };
+}
+
+function buildShareText(){
+  var bd=bodyData(); var s=seasonData(); var sc=calcScores();
+  var isMale=state.gender==='male';
+  return '✨ Grace AI 품격 진단 완료!\n\n'+
+    '👤 '+(isMale?'남성 · 신뢰와 성공':'여성 · 우아함과 자아 일치')+'\n'+
+    '👗 '+(isMale?'골격':'체형')+': '+(bd.label||'-')+'\n'+
+    '🎨 퍼스널 컬러: '+(s.label||'-')+'\n'+
+    '📊 종합 점수: '+sc.total+'점 ('+getGradeLabel()+')\n\n'+
+    '"'+(isMale?'신뢰와 성공을 향한, 나만의 시그니처를 찾았습니다.':'있는 그대로의 우아함, 나만의 품격을 찾아가고 있어요.')+'"\n\n'+
+    '#GraceAI #이미지브랜딩 #퍼스널컬러 #4050품격';
+}
+
+async function shareReport(){
+  showToast('공유 카드를 만들고 있어요... ✨');
+  try{ showShareSheet(await generateShareCard(), buildShareText(), 'report'); }
+  catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
+}
+async function shareKakao(){
+  showToast('카카오톡 카드를 만들고 있어요... 💛');
+  try{ showShareSheet(await generateShareCard(), buildShareText(), 'kakao'); }
+  catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
+}
+async function shareInsta(){
+  showToast('인스타그램 카드를 만들고 있어요... 📸');
+  try{ showShareSheet(await generateShareCard(), buildShareText(), 'insta'); }
+  catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
+}
+async function shareChatMsg(idx){
+  var aiMsg=state.chatHistory[idx];
+  if(!aiMsg||aiMsg.role!=='assistant') return;
+  var userMsg=(idx>0&&state.chatHistory[idx-1].role==='user')?state.chatHistory[idx-1]:null;
+  var s=seasonData(); var isMale=state.gender==='male';
+  var captionText='✨ Grace AI 코칭 내용 공유\n\n'+
+    (userMsg?'💬 질문: '+userMsg.content+'\n\n':'')+
+    '🤖 Grace AI:\n'+aiMsg.content+'\n\n'+
+    '━━━━━━━━━━━━━\n'+
+    '👤 '+(isMale?'남성 · 신뢰와 성공':'여성 · 우아함과 자아 일치')+'\n'+
+    '🎨 퍼스널 컬러: '+s.label+'\n'+
+    '#GraceAI #이미지코칭 #퍼스널스타일 #4050품격';
+  showToast('공유 카드를 만들고 있어요... ✨');
+  try{ showShareSheet(await generateChatCard(userMsg?userMsg.content:'', aiMsg.content), captionText, 'chat'); }
+  catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
+}
+
+function downloadCard(card){
+  var dataUrl=card&&card.dataUrl ? card.dataUrl : card;
+  var a=document.createElement('a');
+  a.href=dataUrl; a.download='grace-ai-report.png';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){document.body.removeChild(a);},1000);
+  showToast('이미지를 저장했어요! 📸');
+}
+
+
+
+
+
+function copyToClipboard(text){
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){showToast('클립보드에 복사됐어요!\n카카오톡·SNS에 붙여넣기 해보세요 😊');});
+  } else {
+    var ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('클립보드에 복사됐어요!\n카카오톡·SNS에 붙여넣기 해보세요 😊');
+  }
+}
+
+
+function showToast(msg){
+  var t=document.getElementById('graceToast');
+  if(!t){t=document.createElement('div');t.id='graceToast';
+    t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(0);background:#2B2A33;color:#fff;padding:13px 22px;border-radius:16px;font-size:.88rem;line-height:1.55;text-align:center;z-index:9999;max-width:300px;box-shadow:0 6px 28px rgba(0,0,0,.35);white-space:pre-line;transition:opacity .3s;';
+    document.body.appendChild(t);}
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.style.opacity='0';},3200);
+}
+
+
+
+/* ═══════════════════ CLAUDE API ═══════════════════ */
+function buildSystemPrompt(){
+  var bd=bodyData(); var s=seasonData();
+  var gl=state.gender==='male'?'남성':'여성';
+  var specific=state.gender==='male'
+    ?'전문직 고정관념 활용: 직업 특성에 맞는 안경 테, 넥타이 컬러를 YOLO 데이터와 매칭하여 전략적으로 제안하세요. 메러비안 법칙(55% 외모, 38% 발성, 7% 언어) 기반 통합 코칭을 제공하세요.'
+    :'4가지 스타일링 불일치(입고 싶은 것 vs 어울리는 것 등) 해소에 집중하세요. 자아일치성(Self-Congruence) 코칭으로 이상적 자아와 실제 자아의 간극을 줄여주세요.';
+  return 'Grace AI의 품격 있는 라이프스타일 큐레이터입니다.\n\n현재 상황:\n- '+ctxSummary()+'\n\n사용자 프로필:\n- 성별: '+gl+'\n- 체형/골격: '+(bd.label||'미진단')+' — '+(bd.desc||'')+'\n- 퍼스널 컬러: '+(s.label||'미진단')+' ('+s.tone+')\n- AI 추천 스타일: '+(bd.outfit||'')+'\n\n상담 원칙:\n1. 자아일치성 코칭: 실제 이미지와 이상적 이미지 간극을 줄여주세요.\n2. 비언어 트레이닝 연계: 의상 추천 후 발성·미소·자세 훈련을 함께 안내하세요.\n3. '+specific+'\n4. 오늘의 날씨·계절·시간대('+ctxSummary()+')를 반영한 TPO 코디를 제안하세요.\n5. 이미지 메이킹 5계명(표정, 자세, 발성, 의상, 내면)을 통합적으로 적용하세요.\n\n말투: 따뜻하고 전문적인 코치. 존댓말. 2-4문장 내외로 간결하게. 한국어만 사용.';
+}
+async function callClaude(userMsg){
+  // sendMessage가 chatHistory에 userMsg push 후 호출
+  // -> chatHistory 그대로 사용 (중복 push 금지)
+  var msgs=state.chatHistory
+    .filter(function(m){ return m.role==='user'||m.role==='assistant'; })
+    .filter(function(m){
+      return m.content &&
+             m.content!=='잠시 연결이 원활하지 않아요. 다시 시도해 주세요.' &&
+             m.content!=='죄송해요, 응답을 받지 못했어요. 다시 질문해 주세요.';
+    })
+    .map(function(m){ return {role:m.role,content:m.content}; });
+
+  // user/assistant 교대 보장 (API 요건)
+  var cleaned=[];
+  msgs.forEach(function(m){
+    if(!cleaned.length || cleaned[cleaned.length-1].role!==m.role) cleaned.push(m);
+  });
+  if(!cleaned.length || cleaned[cleaned.length-1].role!=='user') return null;
+
+  var res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:1000,
+      system:buildSystemPrompt(),
+      messages:cleaned
+    })
+  });
+  if(!res.ok){
+    var errBody=await res.text().catch(function(){return '';});
+    throw new Error('HTTP '+res.status+' '+errBody.substring(0,120));
+  }
+  var data=await res.json();
+  if(data.content&&data.content[0]&&data.content[0].text) return data.content[0].text;
+  throw new Error('빈 응답: '+JSON.stringify(data).substring(0,80));
+}
+
+/* ═══════════════════ STT ═══════════════════ */
+var recognition=null;
+function initSTT(){
+  var SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRec)return;
+  recognition=new SpeechRec();
+  recognition.lang='ko-KR'; recognition.continuous=false; recognition.interimResults=true;
+  recognition.onresult=function(e){
+    var transcript='';
+    for(var i=e.resultIndex;i<e.results.length;i++)transcript+=e.results[i][0].transcript;
+    var inp=document.getElementById('chatInput');
+    if(inp)inp.value=transcript;
+    if(e.results[e.results.length-1].isFinal){stopSTT();sendMessage();}
+  };
+  recognition.onerror=function(){stopSTT();};
+  recognition.onend=function(){if(state.sttActive)stopSTT();};
+}
+function startSTT(){
+  if(!recognition){var inp=document.getElementById('chatInput');if(inp)inp.focus();return;}
+  state.sttActive=true;
+  var vb=document.getElementById('voiceBtn'); if(vb)vb.classList.add('listening');
+  var wrap=document.getElementById('chatInputWrap'); if(wrap)wrap.classList.add('listening');
+  var badge=document.getElementById('sttBadge'); if(badge)badge.classList.add('show');
+  recognition.start();
+}
+function stopSTT(){
+  state.sttActive=false;
+  if(recognition)try{recognition.stop();}catch(e){}
+  var vb=document.getElementById('voiceBtn'); if(vb)vb.classList.remove('listening');
+  var wrap=document.getElementById('chatInputWrap'); if(wrap)wrap.classList.remove('listening');
+  var badge=document.getElementById('sttBadge'); if(badge)badge.classList.remove('show');
+}
+
+/* ═══════════════════ CHAT ACTIONS ═══════════════════ */
+function escHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function sendMessage(text){
+  var inp=document.getElementById('chatInput');
+  var msg=(text||(inp&&inp.value)||'').trim();
+  if(!msg||state.isTyping) return;
+  if(inp){ inp.value=''; inp.style.height='auto'; }
+  // 직전 에러 메시지는 제거 후 재시도
+  if(state.chatHistory.length){
+    var last=state.chatHistory[state.chatHistory.length-1];
+    if(last.role==='assistant'&&(
+      last.content==='잠시 연결이 원활하지 않아요. 다시 시도해 주세요.'||
+      last.content==='죄송해요, 응답을 받지 못했어요. 다시 질문해 주세요.'
+    )) state.chatHistory.pop();
+  }
+  state.chatHistory.push({role:'user',content:msg});
+  state.isTyping=true;
+  renderMain(); scrollChat();
+  try{
+    var reply=await callClaude(msg);
+    if(reply){
+      state.chatHistory.push({role:'assistant',content:reply});
+    } else {
+      state.chatHistory.pop();
+      state.chatHistory.push({role:'assistant',content:'죄송해요, 응답을 받지 못했어요. 다시 질문해 주세요.'});
+    }
+  } catch(e){
+    console.error('[Grace AI]',e.message);
+    state.chatHistory.push({role:'assistant',content:'잠시 연결이 원활하지 않아요. 다시 시도해 주세요.'});
+  }
+  state.isTyping=false; state.quickSet++;
+  renderMain(); scrollChat();
+}
+function sendQuick(q){sendMessage(q);}
+function scrollChat(){
+  setTimeout(function(){var el=document.getElementById('chatMessages');if(el)el.scrollTop=el.scrollHeight;},60);
+}
+
+/* ═══════════════════ NAVIGATION ═══════════════════ */
+function goNext(){
+  clearTimers();
+  var step=DIAG_STEPS[state.stepIndex];
+  if(state.stepIndex<DIAG_STEPS.length-1){
+    state.stepIndex++;
+    renderDiag();
+    if(DIAG_STEPS[state.stepIndex]==='analyzing')startAnalyzing();
+  } else {
+    enterMain();
+  }
+}
+function goBack(){
+  clearTimers();
+  var step=DIAG_STEPS[state.stepIndex];
+  if(step==='color'&&state.colorStep>0){state.colorStep--;renderDiag();return;}
+  if(state.stepIndex>0){
+    state.stepIndex--;
+    if(DIAG_STEPS[state.stepIndex]==='analyzing')state.stepIndex--;
+    renderDiag();
+  }
+}
+function enterMain(){
+  state.phase='main'; state.tab='result';
+  document.getElementById('diagPhase').style.display='none';
+  document.getElementById('mainPhase').style.display='flex';
+  renderMain(); updateNav();
+}
+function switchTab(tab){
+  state.tab=tab; renderMain(); updateNav();
+  var tc=document.getElementById('tabContent'); if(tc)tc.scrollTop=0;
+}
+function toggleCoach(id){state.coachDone[id]=!state.coachDone[id];renderMain();}
+function selectGender(g){state.gender=g;renderDiag();}
+function selectBody(k){state.bodyKey=k;renderDiag();}
+function answerColor(field,val){
+  if(field==='warmCool'){state.warmCool=val;state.colorStep=1;}
+  else{state.brightSoft=val;var wc=state.warmCool,bs=val;state.season=wc==='warm'&&bs==='bright'?'spring':wc==='warm'&&bs==='soft'?'autumn':wc==='cool'&&bs==='bright'?'winter':'summer';state.colorStep=2;}
+  renderDiag();
+}
+function restart(){
+  clearTimers(); stopSTT(); closeShareSheet();
+  state={phase:'diagnosis',stepIndex:0,gender:null,bodyKey:null,colorStep:0,warmCool:null,brightSoft:null,season:null,coachDone:{},tab:'result',chatHistory:[],isTyping:false,quickSet:0,sttActive:false};
+  document.getElementById('mainPhase').style.display='none';
+  document.getElementById('diagPhase').style.display='flex';
+  renderDiag();
+}
+
+/* ═══════════════════ ANALYZING ANIMATION ═══════════════════ */
+function startAnalyzing(){
+  var caps=['체형 데이터를 분석하고 있어요','YOLO 2단계 라벨링을 진행해요','최적의 코디를 매칭하고 있어요'];
+  var ci=0;
+  var t1=setInterval(function(){ci=(ci+1)%caps.length;var el=document.getElementById('analyzeCaption');if(el)el.textContent=caps[ci];},950);timers.push(t1);
+  var ring=document.getElementById('ringProgress'),pctEl=document.getElementById('ringPct'),pct=0;
+  var t2=setInterval(function(){pct+=4;if(pct>100)pct=100;if(ring)ring.setAttribute('stroke-dashoffset',339-(339*pct/100));if(pctEl)pctEl.textContent=pct+'%';if(pct>=100){clearInterval(t2);var t3=setTimeout(function(){enterMain();},400);timers.push(t3);}},100);timers.push(t2);
+  var skip=document.getElementById('skipBtn');if(skip)skip.addEventListener('click',function(){clearTimers();enterMain();});
+}
+
+/* ═══════════════════ RENDERS ═══════════════════ */
+function renderDiag(){
+  var step=DIAG_STEPS[state.stepIndex];
+  document.getElementById('visualZone').innerHTML=visualFor(step);
+  var cz=document.getElementById('contentZone');
+  cz.innerHTML=contentFor(step);
+  cz.classList.remove('fade-in');void cz.offsetWidth;cz.classList.add('fade-in');
+  document.getElementById('actionBar').innerHTML=actionsFor(step);
+  // topbar
+  var back=document.getElementById('backBtn');
+  var canBack=state.stepIndex>0&&step!=='analyzing';
+  back.classList.toggle('hidden',!canBack);
+  document.getElementById('brandMini').classList.toggle('hidden',step==='splash');
+  var dots=document.getElementById('dots');
+  var showSteps=['gender','body','color'];
+  if(showSteps.indexOf(step)>-1){dots.innerHTML=showSteps.map(function(s){return'<span class="dot'+(s===step?' active':'')+'"></span>';}).join('');}
+  else dots.innerHTML='';
+}
+function renderMain(){
+  var content='';
+  if(state.tab==='result')content=renderResult();
+  else if(state.tab==='coaching')content=renderCoaching();
+  else if(state.tab==='chatbot')content=renderChatbot();
+  else if(state.tab==='report')content=renderReport();
+  var tc=document.getElementById('tabContent');
+  if(tc){tc.innerHTML=content;tc.classList.remove('fade-in');void tc.offsetWidth;tc.classList.add('fade-in');}
+  // chat input bar
+  var bar=document.getElementById('chatInputBar');
+  if(bar)bar.style.display=state.tab==='chatbot'?'block':'none';
+  // topbar (main phase)
+  document.getElementById('backBtn').classList.add('hidden');
+  document.getElementById('brandMini').classList.remove('hidden');
+  document.getElementById('dots').innerHTML='';
+  if(state.tab==='chatbot')scrollChat();
+  bindChatInput();
+}
+function updateNav(){
+  var tone=accentTone();
+  document.querySelectorAll('.nav-tab').forEach(function(btn){
+    var t=btn.dataset.tab;
+    btn.classList.remove('active','active-navy','active-rose');
+    if(t===state.tab){
+      if(tone==='navy')btn.classList.add('active-navy');
+      else if(tone==='rose')btn.classList.add('active-rose');
+      else btn.classList.add('active');
+    }
+  });
+}
+function bindChatInput(){
+  var inp=document.getElementById('chatInput');
+  var send=document.getElementById('sendBtn');
+  var vBtn=document.getElementById('voiceBtn');
+  if(inp&&!inp._bound){
+    inp._bound=true;
+    inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px';});
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+  }
+  if(send&&!send._bound){send._bound=true;send.addEventListener('click',function(){sendMessage();});}
+  if(vBtn&&!vBtn._bound){vBtn._bound=true;vBtn.addEventListener('click',function(){if(state.sttActive)stopSTT();else startSTT();});}
+  if(send){
+    var tone=accentTone();
+    send.className='send-btn'+(tone?' tone-'+tone:'');
+  }
+}
+
+/* ═══════════════════ DATE · TIME · WEATHER CONTEXT ═══════════════════ */
+var ctx = {
+  dateStr:'', timeStr:'', timePeriod:'', calSeason:'',
+  weatherDesc:'', weatherTemp:'', weatherIcon:'',
+  loaded:false
+};
+
+function initContext(){
+  var now = new Date();
+  var month = now.getMonth()+1;
+  var hour  = now.getHours();
+
+  // Date
+  ctx.dateStr = now.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  ctx.timeStr = now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+
+  // Time period
+  if(hour>=5&&hour<9)       ctx.timePeriod='이른 아침';
+  else if(hour>=9&&hour<12) ctx.timePeriod='오전';
+  else if(hour>=12&&hour<14)ctx.timePeriod='점심';
+  else if(hour>=14&&hour<18)ctx.timePeriod='오후';
+  else if(hour>=18&&hour<21)ctx.timePeriod='저녁';
+  else                       ctx.timePeriod='밤';
+
+  // Calendar season (Korea)
+  if(month>=3&&month<=5)       ctx.calSeason='봄 🌸';
+  else if(month>=6&&month<=8)  ctx.calSeason='여름 ☀️';
+  else if(month>=9&&month<=11) ctx.calSeason='가을 🍂';
+  else                          ctx.calSeason='겨울 ❄️';
+
+  // Fetch weather via Open-Meteo (free, no key)
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude.toFixed(4);
+      var lon=pos.coords.longitude.toFixed(4);
+      fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon
+        +'&current=temperature_2m,weathercode&timezone=auto')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var temp = Math.round(d.current.temperature_2m);
+        var code = d.current.weathercode;
+        ctx.weatherTemp = temp+'°C';
+        ctx.weatherDesc = wmoDesc(code);
+        ctx.weatherIcon = wmoIcon(code);
+        ctx.loaded = true;
+        // refresh topbar if in main phase
+        if(state.phase==='main') renderWeatherBar();
+      })
+      .catch(function(){ ctx.loaded=true; });
+    }, function(){ ctx.loaded=true; });
+  } else {
+    ctx.loaded = true;
+  }
+}
+
+function wmoDesc(code){
+  if(code===0)return '맑음';
+  if(code<=2) return '구름 조금';
+  if(code<=3) return '흐림';
+  if(code<=49)return '안개';
+  if(code<=59)return '이슬비';
+  if(code<=69)return '비';
+  if(code<=79)return '눈';
+  if(code<=82)return '소나기';
+  if(code<=99)return '뇌우';
+  return '흐림';
+}
+function wmoIcon(code){
+  if(code===0)return '☀️';
+  if(code<=2) return '⛅';
+  if(code<=3) return '☁️';
+  if(code<=49)return '🌫️';
+  if(code<=69)return '🌧️';
+  if(code<=79)return '❄️';
+  if(code<=82)return '🌦️';
+  return '⛈️';
+}
+
+function renderWeatherBar(){
+  var bar = document.getElementById('weatherBar');
+  if(!bar) return;
+  var weatherPart = ctx.weatherTemp
+    ? ctx.weatherIcon+' '+ctx.weatherDesc+' '+ctx.weatherTemp+' · '
+    : '';
+  bar.textContent = weatherPart + ctx.calSeason + ' · ' + ctx.timePeriod + ' · ' + ctx.timeStr;
+}
+
+function weatherBarHTML(){
+  var weatherPart = ctx.weatherTemp
+    ? ctx.weatherIcon+' '+ctx.weatherDesc+' '+ctx.weatherTemp+' · '
+    : '';
+  var text = weatherPart + ctx.calSeason + ' · ' + ctx.timePeriod + ' · ' + ctx.timeStr;
+  return '<div id="weatherBar" style="'+
+    'font-size:.74rem;font-weight:700;color:var(--gold-deep);'+
+    'background:var(--gold-bg);border-radius:999px;'+
+    'padding:5px 14px;display:inline-flex;align-items:center;gap:4px;'+
+    'letter-spacing:.01em;margin-bottom:12px;">'+text+'</div>';
+}
+
+function ctxSummary(){
+  var w = ctx.weatherTemp ? '날씨 '+ctx.weatherDesc+' '+ctx.weatherTemp+',' : '';
+  return ctx.calSeason.replace(/\s*[🌸☀️🍂❄️]/u,'').trim()+'계절, '+w+' '+ctx.timePeriod+', '+ctx.dateStr;
+}
+
+
+document.getElementById('backBtn').addEventListener('click',goBack);
+initSTT();
+initContext();
+
+/* 모바일 키보드 대응 - 채팅 입력창 키보드 위로 올리기 */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',function(){
+    var bar=document.getElementById('chatInputBar');
+    if(!bar||state.tab!=='chatbot') return;
+    var offset=Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+    bar.style.transform = offset>50 ? 'translateY(-'+Math.min(offset,320)+'px)' : '';
+    bar.style.transition = 'transform .12s ease';
+    var msgs=document.getElementById('chatMessages');
+    if(msgs) setTimeout(function(){msgs.scrollTop=msgs.scrollHeight;},80);
+  });
+  window.visualViewport.addEventListener('scroll',function(){
+    var bar=document.getElementById('chatInputBar');
+    if(bar) bar.style.transform='';
+  });
+}
+
+/* 스크롤 복원 방지 */
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+
+renderDiag();
+
+window.GraceApp={
+  goNext:goNext, goBack:goBack, restart:restart, switchTab:switchTab,
+  selectGender:selectGender, selectBody:selectBody, answerColor:answerColor,
+  toggleCoach:toggleCoach, sendQuick:sendQuick,
+  setCat:setCat, shareChatMsg:shareChatMsg,
+  shareReport:shareReport,
+  copyReport:function(){ copyToClipboard(buildShareText()); },
+  shareKakao:shareKakao,
+  shareInsta:shareInsta
+};
+})();
+</script>
+</body>
+</html>
