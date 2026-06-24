@@ -408,6 +408,18 @@ p.desc{font-size:clamp(.86rem,3.4vw,.96rem); line-height:1.6; color:var(--ink-so
 
 
 
+/* API 키 설정 UI */
+.api-setup{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:0 var(--pad-h);text-align:center;gap:14px;}
+.api-setup-icon{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));display:flex;align-items:center;justify-content:center;margin:0 auto;}
+.api-setup-icon svg{width:28px;height:28px;color:#fff;}
+.api-setup-title{font-family:'Noto Serif KR',serif;font-size:clamp(1rem,4vw,1.15rem);font-weight:700;margin:0;}
+.api-setup-desc{font-size:clamp(.8rem,3.2vw,.88rem);color:var(--ink-soft);line-height:1.6;margin:0;}
+.api-key-input-wrap{width:100%;display:flex;flex-direction:column;gap:8px;}
+.api-key-input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:clamp(.86rem,3.4vw,.94rem);font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#fff;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+.api-key-input:focus{border-color:var(--gold);}
+.api-key-hint{font-size:clamp(.72rem,2.8vw,.78rem);color:var(--ink-soft);text-align:left;line-height:1.5;}
+.api-key-hint a{color:var(--gold-deep);text-decoration:underline;}
+
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important; transition-duration:.001ms!important;}}
 
 /* ── QR 코드 모달 ── */
@@ -567,7 +579,7 @@ var state={
   chatHistory:[],
   isTyping:false, quickSet:0,
   sttActive:false,
-
+  apiKey:(function(){try{return sessionStorage.getItem('grace_api_key')||'';}catch(e){return '';}}())
 };
 var timers=[];
 function clearTimers(){timers.forEach(function(t){clearTimeout(t);clearInterval(t);});timers=[];}
@@ -969,13 +981,29 @@ function renderChatbot(){
   var qrSet=qrSets[catIdx];
   var accentHex=tone==='navy'?'#22395C':tone==='rose'?'#9C5E78':'#B6925B';
 
+  /* ── API 키 미설정 시 설정 화면 ── */
+  if(!state.apiKey){
+    return '<div class="api-setup">'+
+      '<div class="api-setup-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
+      '<h2 class="api-setup-title">Claude API 키 설정</h2>'+
+      '<p class="api-setup-desc">Grace AI 챗봇을 사용하려면<br>Anthropic API 키가 필요해요.<br>한 번만 입력하면 계속 사용할 수 있어요.</p>'+
+      '<div class="api-key-input-wrap">'+
+        '<input id="apiKeyInput" class="api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"/>'+
+        '<p class="api-key-hint">'+
+          '키 발급: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>에서<br>무료 계정 생성 후 API 키를 복사해주세요.'+
+        '</p>'+
+      '</div>'+
+      '<button onclick="GraceApp.applyApiKey()" class="btn btn-primary btn-sm" style="background:'+accentHex+';">저장하고 시작하기</button>'+
+    '</div>';
+  }
+
   /* ── 카테고리 탭 ── */
   var catHtml='<div class="chat-cats" id="chatCats">'+
     cats.map(function(c,i){
       var cls='cat-tab'+(i===catIdx?activeTabClass:'');
       return '<button class="'+cls+'" onclick="GraceApp.setCat('+i+')">'+c+'</button>';
     }).join('')+
-
+    '<button class="cat-tab" onclick="GraceApp.clearApiKey()" title="API 키 초기화" style="color:var(--danger);border-color:var(--danger);">🔑 키 변경</button>'+
   '</div>';
 
   /* ── 퀵 리플라이 ── */
@@ -1805,8 +1833,24 @@ function showToast(msg){
 
 
 
-/* ═══════════════════ CLAUDE API (Vercel Proxy) ═══════════════════ */
-// API 키는 Vercel 환경 변수(ANTHROPIC_API_KEY)에 안전하게 저장됩니다.
+/* ═══════════════════ CLAUDE API ═══════════════════ */
+function saveApiKey(key){
+  state.apiKey=(key||'').trim();
+  try{ sessionStorage.setItem('grace_api_key',state.apiKey); }catch(e){}
+  renderMain();
+}
+function clearApiKey(){
+  state.apiKey='';
+  try{ sessionStorage.removeItem('grace_api_key'); }catch(e){}
+  state.chatHistory=[];
+  renderMain();
+}
+function applyApiKey(){
+  var inp=document.getElementById('apiKeyInput');
+  if(!inp||!inp.value.trim()){ showToast('API 키를 입력해주세요.'); return; }
+  saveApiKey(inp.value.trim());
+  showToast('API 키가 저장됐어요! 챗봇을 사용해보세요. ✨');
+}
 
 function buildSystemPrompt(){
   var bd=bodyData(); var s=seasonData();
@@ -1824,14 +1868,14 @@ function _buildSys(){
   }
 }
 
-/* ═══ Claude API (Vercel Proxy 호출) ══════ */
 function _buildMsgs(){
-  var BAD=['연결이 원활','응답을 받지','인터넷 연결','응답이 너무','HTTP ','empty','오류'];
+  var BAD=['잠시 연결','죄송해요, 응답','인터넷 연결','응답이 너무','API 키','네트워크','인증 오류','서버 오류','오류 4','오류 5'];
   var out=[];
   state.chatHistory.forEach(function(m){
     if(m.role!=='user'&&m.role!=='assistant') return;
     if(!m.content||!m.content.trim()) return;
-    var bad=false; BAD.forEach(function(b){ if(m.content.indexOf(b)>=0) bad=true; });
+    var bad=false;
+    BAD.forEach(function(b){ if(m.content.indexOf(b)>=0) bad=true; });
     if(bad) return;
     if(out.length&&out[out.length-1].role===m.role) return;
     out.push({role:m.role, content:m.content.trim()});
@@ -1840,25 +1884,28 @@ function _buildMsgs(){
 }
 
 async function callClaude(){
+  var key=state.apiKey;
+  if(!key){ throw new Error('API 키를 먼저 입력해주세요.'); }
+
   var msgs=_buildMsgs();
   if(!msgs.length||msgs[msgs.length-1].role!=='user') return null;
 
   var sys=_buildSys();
   var body={
     system: sys,
-    messages: msgs
+    messages: msgs,
+    apiKey: key // 프록시로 API 키 전달
   };
 
   var res;
   try{
-    // 자체 구축한 Vercel 서버리스 함수 호출
     res=await fetch('/api/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(body)
     });
   }catch(e){
-    throw new Error('네트워크 연결 실패. 잠시 후 다시 시도해 주세요.');
+    throw new Error('네트워크 연결 실패. Wi-Fi·데이터를 확인해주세요.');
   }
 
   var text='';
@@ -1866,18 +1913,15 @@ async function callClaude(){
 
   if(!res.ok){
     var code=res.status;
-    if(code===429) throw new Error('요청이 너무 많아요. 잠시 후 다시 시도해 주세요.');
-    if(code>=500) throw new Error('서버 오류. 잠시 후 다시 시도해 주세요.');
-    throw new Error('HTTP '+code);
+    if(code===401||code===403){ clearApiKey(); throw new Error('API 키가 올바르지 않아요. 다시 입력해주세요.'); }
+    if(code===429) throw new Error('요청 한도 초과. 잠시 후 다시 시도해 주세요.');
+    if(code>=500) throw new Error('Anthropic 서버 오류. 잠시 후 다시 시도해 주세요.');
+    throw new Error('오류 '+code);
   }
 
   var data;
   try{ data=JSON.parse(text); }catch(e){ throw new Error('응답 형식 오류'); }
-  
-  if(data.content&&data.content[0]&&data.content[0].text) {
-    return data.content[0].text;
-  }
-  
+  if(data.content&&data.content[0]&&data.content[0].text) return data.content[0].text;
   if(data.error) throw new Error(data.error.message||'API 오류');
   throw new Error('빈 응답');
 }
@@ -1886,6 +1930,7 @@ async function sendMessage(text){
   var inp=document.getElementById('chatInput');
   var msg=(text||(inp&&inp.value)||'').trim();
   if(!msg||state.isTyping) return;
+  if(!state.apiKey){ showToast('먼저 API 키를 입력해주세요. 🔑'); renderMain(); return; }
   if(inp){ inp.value=''; inp.style.height='auto'; }
 
   /* 직전 에러 메시지 제거 */
@@ -1893,7 +1938,8 @@ async function sendMessage(text){
     var last=state.chatHistory[state.chatHistory.length-1];
     if(last.role==='assistant'&&(
       last.content.indexOf('연결')>=0||last.content.indexOf('오류')>=0||
-      last.content.indexOf('시도')>=0||last.content.indexOf('HTTP')>=0
+      last.content.indexOf('시도')>=0||last.content.indexOf('API')>=0||
+      last.content.indexOf('입력')>=0
     )){ state.chatHistory.pop(); } else break;
   }
 
@@ -2311,7 +2357,8 @@ window.GraceApp={
   shareReport:shareReport,
   copyReport:function(){ copyToClipboard(buildShareText()); },
   shareKakao:shareKakao, shareInsta:shareInsta,
-  showQR:showQR, closeQR:closeQR
+  showQR:showQR, closeQR:closeQR,
+  applyApiKey:applyApiKey, clearApiKey:clearApiKey
 };
 })();
 </script>

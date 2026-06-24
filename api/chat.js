@@ -24,12 +24,12 @@ export default async function handler(req) {
 
   try {
     const body = await req.json();
-    const { messages, system } = body;
+    const { messages, system, apiKey: clientApiKey } = body;
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = clientApiKey || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Server configuration error: ANTHROPIC_API_KEY is missing.' }), {
-        status: 500,
+      return new Response(JSON.stringify({ error: 'API 키가 필요합니다. 환경 변수를 설정하거나 요청에 포함해주세요.' }), {
+        status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
