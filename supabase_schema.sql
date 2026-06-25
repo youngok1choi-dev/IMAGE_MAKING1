@@ -57,7 +57,7 @@ alter table sessions add column if not exists bright_soft text;
 alter table sessions add column if not exists total_score int;
 alter table sessions add column if not exists completed_at timestamptz;
 
--- RLS 활성화 (익명 insert 허용)
+-- RLS 활성화
 alter table page_views enable row level security;
 alter table sessions enable row level security;
 alter table chat_messages enable row level security;
@@ -68,15 +68,36 @@ alter table share_events enable row level security;
 drop policy if exists "anon insert" on page_views;
 drop policy if exists "anon insert" on sessions;
 drop policy if exists "anon update" on sessions;
+drop policy if exists "allow insert" on sessions;
+drop policy if exists "allow update" on sessions;
+drop policy if exists "allow select" on sessions;
 drop policy if exists "anon insert" on chat_messages;
+drop policy if exists "allow insert" on chat_messages;
+drop policy if exists "allow select" on chat_messages;
 drop policy if exists "anon insert" on coaching_progress;
 drop policy if exists "anon update" on coaching_progress;
+drop policy if exists "allow insert" on coaching_progress;
+drop policy if exists "allow update" on coaching_progress;
+drop policy if exists "allow select" on coaching_progress;
 drop policy if exists "anon insert" on share_events;
+drop policy if exists "allow insert" on share_events;
+drop policy if exists "allow select" on share_events;
 
+-- page_views: anon role 허용
 create policy "anon insert" on page_views for insert to anon with check (true);
-create policy "anon insert" on sessions for insert to anon with check (true);
-create policy "anon update" on sessions for update to anon using (true);
-create policy "anon insert" on chat_messages for insert to anon with check (true);
-create policy "anon insert" on coaching_progress for insert to anon with check (true);
-create policy "anon update" on coaching_progress for update to anon using (true);
-create policy "anon insert" on share_events for insert to anon with check (true);
+
+-- sessions, chat_messages, coaching_progress, share_events:
+-- sb_publishable 키 호환을 위해 role 제한 없이 허용
+create policy "allow insert" on sessions for insert with check (true);
+create policy "allow update" on sessions for update using (true);
+create policy "allow select" on sessions for select using (true);
+
+create policy "allow insert" on chat_messages for insert with check (true);
+create policy "allow select" on chat_messages for select using (true);
+
+create policy "allow insert" on coaching_progress for insert with check (true);
+create policy "allow update" on coaching_progress for update using (true);
+create policy "allow select" on coaching_progress for select using (true);
+
+create policy "allow insert" on share_events for insert with check (true);
+create policy "allow select" on share_events for select using (true);
