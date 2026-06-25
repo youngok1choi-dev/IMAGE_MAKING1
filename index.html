@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
   --ink:#2B2A33; --ink-soft:#736C72; --paper:#FBF7F1; --backdrop:#E9E2D6; --line:#E1D6C6;
@@ -1824,6 +1825,54 @@ function showToast(msg){
 
 
 
+/* ═══════════════════ SUPABASE ═══════════════════ */
+var _SUPA_URL='https://wneyhmbxhnwssxynuknr.supabase.co';
+var _SUPA_KEY='sb_publishable_j0f9PhvSsakAjFHYyka8kw_y-6RR7XT';
+var _sb=null;
+var _sessionId=null;
+
+function initSupabase(){
+  try{
+    _sb=window.supabase.createClient(_SUPA_URL,_SUPA_KEY);
+    _sb.from('page_views').insert({user_agent:navigator.userAgent}).then();
+  }catch(e){console.warn('[Supabase] init error',e);}
+}
+
+async function dbSaveSession(){
+  if(!_sb) return;
+  try{
+    var payload={
+      user_name:state.userName||null,
+      gender:state.gender||null,
+      body_key:state.bodyKey||null,
+      season:state.season||null
+    };
+    if(_sessionId){
+      await _sb.from('sessions').update(payload).eq('id',_sessionId);
+    } else {
+      var res=await _sb.from('sessions').insert(payload).select('id').single();
+      if(res.data) _sessionId=res.data.id;
+    }
+  }catch(e){console.warn('[Supabase] session error',e);}
+}
+
+async function dbSaveChat(role,content){
+  if(!_sb||!_sessionId) return;
+  try{
+    await _sb.from('chat_messages').insert({session_id:_sessionId,role:role,content:content});
+  }catch(e){console.warn('[Supabase] chat error',e);}
+}
+
+async function dbSaveCoaching(coachId,done){
+  if(!_sb||!_sessionId) return;
+  try{
+    await _sb.from('coaching_progress').upsert(
+      {session_id:_sessionId,coach_id:coachId,done:done,updated_at:new Date().toISOString()},
+      {onConflict:'session_id,coach_id'}
+    );
+  }catch(e){console.warn('[Supabase] coaching error',e);}
+}
+
 /* ═══════════════════ CLAUDE API ═══════════════════ */
 // GitHub 시크릿 스캔 우회를 위해 base64 인코딩 사용
 var _a1='sk-ant-api03-';
@@ -1932,6 +1981,8 @@ async function sendMessage(text){
 
   if(reply){
     state.chatHistory.push({role:'assistant',content:reply});
+    dbSaveChat('user',msg);
+    dbSaveChat('assistant',reply);
   } else if(errMsg){
     state.chatHistory.push({role:'assistant',content:errMsg});
   } else {
@@ -2019,12 +2070,13 @@ function enterMain(){
   document.getElementById('diagPhase').style.display='none';
   document.getElementById('mainPhase').style.display='flex';
   renderMain(); updateNav();
+  dbSaveSession();
 }
 function switchTab(tab){
   state.tab=tab; renderMain(); updateNav();
   var tc=document.getElementById('tabContent'); if(tc)tc.scrollTop=0;
 }
-function toggleCoach(id){state.coachDone[id]=!state.coachDone[id];renderMain();}
+function toggleCoach(id){state.coachDone[id]=!state.coachDone[id];renderMain();dbSaveCoaching(id,!!state.coachDone[id]);}
 function selectGender(g){state.gender=g;renderDiag();}
 function selectBody(k){state.bodyKey=k;renderDiag();}
 function answerColor(field,val){
@@ -2332,6 +2384,7 @@ if(window.visualViewport){
 /* 스크롤 복원 방지 */
 if('scrollRestoration' in history) history.scrollRestoration='manual';
 
+initSupabase();
 renderDiag();
 
 window.GraceApp={
