@@ -1838,7 +1838,7 @@ var _sessionId=null;
 function initSupabase(){
   try{
     _sb=window.supabase.createClient(_SUPA_URL,_SUPA_KEY);
-    _sb.from('page_views').insert({user_agent:navigator.userAgent,referrer:document.referrer||null}).then();
+    _sb.from('page_views').insert({user_agent:navigator.userAgent}).then();
   }catch(e){console.warn('[Supabase] init error',e);}
 }
 
