@@ -1845,16 +1845,11 @@ function initSupabase(){
 async function dbSaveSession(){
   if(!_sb) return;
   try{
-    var sc=calcScores();
     var payload={
       user_name:state.userName||null,
       gender:state.gender||null,
       body_key:state.bodyKey||null,
-      warm_cool:state.warmCool||null,
-      bright_soft:state.brightSoft||null,
-      season:state.season||null,
-      total_score:sc.total||null,
-      completed_at:new Date().toISOString()
+      season:state.season||null
     };
     if(_sessionId){
       await _sb.from('sessions').update(payload).eq('id',_sessionId);
