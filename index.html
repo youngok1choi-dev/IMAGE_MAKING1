@@ -1758,16 +1758,19 @@ function buildShareText(){
 
 async function shareReport(){
   showToast('공유 카드를 만들고 있어요... ✨');
+  dbSaveShare('report');
   try{ showShareSheet(await generateShareCard(), buildShareText(), 'report'); }
   catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
 }
 async function shareKakao(){
   showToast('카카오톡 카드를 만들고 있어요... 💛');
+  dbSaveShare('kakao');
   try{ showShareSheet(await generateShareCard(), buildShareText(), 'kakao'); }
   catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
 }
 async function shareInsta(){
   showToast('인스타그램 카드를 만들고 있어요... 📸');
+  dbSaveShare('insta');
   try{ showShareSheet(await generateShareCard(), buildShareText(), 'insta'); }
   catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
 }
@@ -1784,6 +1787,7 @@ async function shareChatMsg(idx){
     '🎨 퍼스널 컬러: '+s.label+'\n'+
     '#GraceAI #이미지코칭 #퍼스널스타일 #4050품격';
   showToast('공유 카드를 만들고 있어요... ✨');
+  dbSaveShare('chat');
   try{ showShareSheet(await generateChatCard(userMsg?userMsg.content:'', aiMsg.content), captionText, 'chat'); }
   catch(e){ console.error('[share]',e); showToast('카드 생성에 실패했어요. 다시 시도해주세요.'); }
 }
@@ -1834,18 +1838,23 @@ var _sessionId=null;
 function initSupabase(){
   try{
     _sb=window.supabase.createClient(_SUPA_URL,_SUPA_KEY);
-    _sb.from('page_views').insert({user_agent:navigator.userAgent}).then();
+    _sb.from('page_views').insert({user_agent:navigator.userAgent,referrer:document.referrer||null}).then();
   }catch(e){console.warn('[Supabase] init error',e);}
 }
 
 async function dbSaveSession(){
   if(!_sb) return;
   try{
+    var sc=calcScores();
     var payload={
       user_name:state.userName||null,
       gender:state.gender||null,
       body_key:state.bodyKey||null,
-      season:state.season||null
+      warm_cool:state.warmCool||null,
+      bright_soft:state.brightSoft||null,
+      season:state.season||null,
+      total_score:sc.total||null,
+      completed_at:new Date().toISOString()
     };
     if(_sessionId){
       await _sb.from('sessions').update(payload).eq('id',_sessionId);
@@ -1854,6 +1863,13 @@ async function dbSaveSession(){
       if(res.data) _sessionId=res.data.id;
     }
   }catch(e){console.warn('[Supabase] session error',e);}
+}
+
+async function dbSaveShare(method){
+  if(!_sb||!_sessionId) return;
+  try{
+    await _sb.from('share_events').insert({session_id:_sessionId,method:method});
+  }catch(e){console.warn('[Supabase] share error',e);}
 }
 
 async function dbSaveChat(role,content){
