@@ -1838,18 +1838,23 @@ var _sessionId=null;
 function initSupabase(){
   try{
     _sb=window.supabase.createClient(_SUPA_URL,_SUPA_KEY);
-    _sb.from('page_views').insert({user_agent:navigator.userAgent}).then();
+    _sb.from('page_views').insert({user_agent:navigator.userAgent,referrer:document.referrer||null}).then();
   }catch(e){console.warn('[Supabase] init error',e);}
 }
 
 async function dbSaveSession(){
   if(!_sb) return;
   try{
+    var scores=calcScores();
     var payload={
       user_name:state.userName||null,
       gender:state.gender||null,
       body_key:state.bodyKey||null,
-      season:state.season||null
+      warm_cool:state.warmCool||null,
+      bright_soft:state.brightSoft||null,
+      season:state.season||null,
+      total_score:scores.total||null,
+      completed_at:new Date().toISOString()
     };
     if(_sessionId){
       await _sb.from('sessions').update(payload).eq('id',_sessionId);
